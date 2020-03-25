@@ -1,1 +1,6 @@
+/.vs
 /builds
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
