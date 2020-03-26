@@ -22,6 +22,16 @@
     <ClCompile Include="source\Main.cpp" />
     <ClCompile Include="source\SafeCall.cpp" />
     <ClCompile Include="source\SafeCall.h" />
+    <ClCompile Include="source\Shader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="README.md" />
+    <None Include="shaders\FragmentShader.shader" />
+    <None Include="shaders\VertexShader.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\Shader.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
