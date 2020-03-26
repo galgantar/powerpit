@@ -1,10 +1,20 @@
 #define GLEW_STATIC
+#define STB_IMAGE_IMPLEMENTATION
 
 #include <glew.h>
 #include <glfw3.h>
 
+#include <glm.hpp>
+#include <vec3.hpp>
+#include <vec4.hpp>
+#include <gtc/type_ptr.hpp>
+#include <gtc/matrix_transform.hpp>
+
+#include <stb_image.h>
+
 #include "SafeCall.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #include <iostream>
 
@@ -46,19 +56,22 @@ int main()
         glfwTerminate();
     }
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader");
+    Texture* texture = new Texture("assets/textures/awesomeface.png", GL_RGBA);
+    Texture* texture2 = new Texture("assets/textures/container.jpg", GL_RGB);
 
     float vertices[] = {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
+        // positions          // colors           // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
-    unsigned int indices[] = { 
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
+    unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
     };
 
     // VAO has to bi bound before VBO and EBO
@@ -76,11 +89,25 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    // stride (distance to next attribute of the same type), void * offset (distance from the begginnig to current attribute)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
 
     shader->Bind();
+    texture->Bind(0);
+    texture2->Bind(1);
+    shader->SetUniform1i("smiley", 0);
+    shader->SetUniform1i("box", 1);
+
+    glm::mat4 trans(1.f);
+    trans = glm::scale(trans, glm::vec3(1.f, 2.f, 1.f));
+    
+    shader->SetUniformMat4f("transform", trans);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -88,6 +115,9 @@ int main()
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        trans = glm::rotate(trans, glm::radians(0.01f), glm::vec3(0.0, 0.0, 1.0));
+        shader->SetUniformMat4f("transform", trans);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
@@ -99,8 +129,11 @@ int main()
     GLcall(glDeleteVertexArrays(1, &VAO));
     GLcall(glDeleteBuffers(1, &VBO));
     GLcall(glDeleteBuffers(1, &EBO));
+
+    // important for clean termination
     delete shader;
-   
+    delete texture;
+
     glfwTerminate();
     return 0;
 }

@@ -1,8 +1,13 @@
 #version 330 core
 
+in vec2 texCoord;
+
+uniform sampler2D smiley;
+uniform sampler2D box;
+
 out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    FragColor = mix(texture(box, texCoord), texture(smiley, texCoord), 0.2);
 };
