@@ -10,7 +10,7 @@ Texture::Texture(const char* filename, int format)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // minifying
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // magnifying
-	
+
 
 	int width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true);
@@ -26,6 +26,7 @@ Texture::Texture(const char* filename, int format)
 	GLcall(glGenerateMipmap(GL_TEXTURE_2D));
 
 	stbi_image_free(data);
+	Unbind();
 }
 
 Texture::~Texture()
@@ -37,4 +38,9 @@ void Texture::Bind(unsigned int unit)
 {
 	GLcall(glActiveTexture(GL_TEXTURE0 + unit));
 	GLcall(glBindTexture(GL_TEXTURE_2D, id));
+}
+
+void Texture::Unbind()
+{
+	GLcall(glBindTexture(GL_TEXTURE_2D, 0));
 }

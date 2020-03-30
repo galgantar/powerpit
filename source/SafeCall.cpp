@@ -4,8 +4,9 @@ void GLClearError() {
     while (glGetError() != GL_NO_ERROR);
 }
 
-bool GLLogCall(const char* function, const char* file, const int line) {
+void GLLogCall(const char* function, const char* file, const int line) {
     GLenum errorCode;
+    
     while ((errorCode = glGetError()) != GL_NO_ERROR) {
         std::string error;
 
@@ -23,5 +24,4 @@ bool GLLogCall(const char* function, const char* file, const int line) {
         }
         std::cout << error << " | " << file << " | " << function << " (" << line << ")" << std::endl;
     }
-    return true;
 }

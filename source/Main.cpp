@@ -41,6 +41,7 @@ int main()
         return -1;
     window = glfwCreateWindow(800, 600, "PowerPit", nullptr, nullptr);
     if (!window) {
+        std::cout << "Window creation failed" << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -57,18 +58,69 @@ int main()
     }
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_DEPTH_TEST);
+
 
     Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader");
     Texture* texture = new Texture("assets/textures/awesomeface.png", GL_RGBA);
     Texture* texture2 = new Texture("assets/textures/container.jpg", GL_RGB);
 
     float vertices[] = {
-        // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
+
+glm::vec3 cubeTranslations[] = {
+  glm::vec3(0.0f,  0.0f,  0.0f),
+  glm::vec3(2.0f,  5.0f, -15.0f),
+  glm::vec3(-1.5f, -2.2f, -2.5f),
+  glm::vec3(-3.8f, -2.0f, -12.3f),
+  glm::vec3(2.4f, -0.4f, -3.5f),
+  glm::vec3(-1.7f,  3.0f, -7.5f),
+  glm::vec3(1.3f, -2.0f, -2.5f),
+  glm::vec3(1.5f,  2.0f, -2.5f),
+  glm::vec3(1.5f,  0.2f, -1.5f),
+  glm::vec3(-1.3f,  1.0f, -1.5f)
+};
     unsigned int indices[] = {
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
@@ -84,18 +136,16 @@ int main()
     GLcall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
     GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
 
-    unsigned int EBO;
+    /*unsigned int EBO;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);*/
 
     // stride (distance to next attribute of the same type), void * offset (distance from the begginnig to current attribute)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
 
     shader->Bind();
@@ -104,22 +154,46 @@ int main()
     shader->SetUniform1i("smiley", 0);
     shader->SetUniform1i("box", 1);
 
-    glm::mat4 trans(1.f);
-    trans = glm::scale(trans, glm::vec3(1.f, 2.f, 1.f));
-    
-    shader->SetUniformMat4f("transform", trans);
+    glm::vec3 cameraPos(0.f, 0.f, 3.f);
+    glm::vec3 target(0.f, 0.f, 0.f);
+    glm::vec3 direction(cameraPos - target); // ??
+    glm::vec3 up(0.f, 1.f, 0.f);
+    glm::vec3 right = glm::normalize(glm::cross(up, direction));
+    glm::vec3 cameraUp = glm::cross(direction, right);
+
+    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    glm::mat4 model(1.0f);
+    model = glm::rotate(model, -3.14f / 3.f , glm::vec3(1.0f, 0.0f, 0.0f));
+
+    //glm::mat4 view(1.0f);
+    //view = glm::translate(view, glm::vec3(0.f, 0.f, -3.f));
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+
+    shader->SetUniformMat4f("model", model);
+    shader->SetUniformMat4f("view", view);
+    shader->SetUniformMat4f("projection", projection);
 
     while (!glfwWindowShouldClose(window))
     {
         ProcessInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        trans = glm::rotate(trans, glm::radians(0.01f), glm::vec3(0.0, 0.0, 1.0));
-        shader->SetUniformMat4f("transform", trans);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        // Draw
+        for (int i = 0; i < 10; ++i) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubeTranslations[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            shader->SetUniformMat4f("model", model);
+        
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         glfwSwapBuffers(window);
 
@@ -128,7 +202,7 @@ int main()
     
     GLcall(glDeleteVertexArrays(1, &VAO));
     GLcall(glDeleteBuffers(1, &VBO));
-    GLcall(glDeleteBuffers(1, &EBO));
+    // GLcall(glDeleteBuffers(1, &EBO));
 
     // important for clean termination
     delete shader;
