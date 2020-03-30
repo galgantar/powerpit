@@ -15,6 +15,7 @@
 #include "SafeCall.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Camera.h"
 
 #include <iostream>
 
@@ -23,9 +24,19 @@ void FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 
-void ProcessInput(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+void ProcessInput(GLFWwindow* window, Camera* camera, float deltaTime) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE))
         glfwSetWindowShouldClose(window, true);
+
+    // Camera
+    if (glfwGetKey(window, GLFW_KEY_W))
+        camera->MoveFront(deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S))
+        camera->MoveBack(deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A))
+        camera->MoveLeft(deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D))
+        camera->MoveRight(deltaTime);
 }
 
 
@@ -147,27 +158,18 @@ glm::vec3 cubeTranslations[] = {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-
     shader->Bind();
     texture->Bind(0);
     texture2->Bind(1);
     shader->SetUniform1i("smiley", 0);
     shader->SetUniform1i("box", 1);
 
-    glm::vec3 cameraPos(0.f, 0.f, 3.f);
-    glm::vec3 target(0.f, 0.f, 0.f);
-    glm::vec3 direction(cameraPos - target); // ??
-    glm::vec3 up(0.f, 1.f, 0.f);
-    glm::vec3 right = glm::normalize(glm::cross(up, direction));
-    glm::vec3 cameraUp = glm::cross(direction, right);
-
-    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    Camera* camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    glm::mat4 view = camera->GetViewMatrix();
 
     glm::mat4 model(1.0f);
     model = glm::rotate(model, -3.14f / 3.f , glm::vec3(1.0f, 0.0f, 0.0f));
-
-    //glm::mat4 view(1.0f);
-    //view = glm::translate(view, glm::vec3(0.f, 0.f, -3.f));
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
@@ -177,9 +179,14 @@ glm::vec3 cubeTranslations[] = {
     shader->SetUniformMat4f("view", view);
     shader->SetUniformMat4f("projection", projection);
 
+    float time = glfwGetTime();
     while (!glfwWindowShouldClose(window))
     {
-        ProcessInput(window);
+        float newTime = glfwGetTime();
+        float deltaTime = newTime - time;
+        time = newTime;
+        
+        ProcessInput(window, camera, deltaTime);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -194,6 +201,7 @@ glm::vec3 cubeTranslations[] = {
         
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+        shader->SetUniformMat4f("view", camera->GetViewMatrix());
 
         glfwSwapBuffers(window);
 

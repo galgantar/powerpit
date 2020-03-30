@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\Main.cpp" />
     <ClCompile Include="source\SafeCall.cpp" />
     <ClCompile Include="source\SafeCall.h" />
@@ -32,6 +33,7 @@
     <None Include="shaders\VertexShader.shader" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\Shader.h" />
     <ClInclude Include="source\Texture.h" />
   </ItemGroup>
