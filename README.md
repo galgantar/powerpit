@@ -1,6 +1,9 @@
 # PowerPit
 Graphics rendering engine based on OpenGL.
 
+## Current features
+* well... it draws a cube
+
 ## Plans for the future
 * Custom math library for vector transformations
 * Lights (diffuse, spectral)
