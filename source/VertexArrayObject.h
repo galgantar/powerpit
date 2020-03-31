@@ -10,7 +10,7 @@ struct VertexAttribute
 	GLenum type;
 	unsigned int normalized;
 	
-	/* distance from the beginnig of the single attribute */
+	/* distance from the beginnig of the single vertex data to the current attribute */
 	int offset;
 };
 
@@ -21,7 +21,7 @@ private:
 	/* distance to next attribute of the same type */
 	int stride;
 	std::vector<VertexAttribute>* attributes;
-	bool isBuild;
+	bool isBuilt;
 
 	void Build();
 

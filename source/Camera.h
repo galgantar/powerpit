@@ -1,6 +1,6 @@
 #pragma once
-#include <vec3.hpp>
-#include <gtc/matrix_transform.hpp>
+
+#include "PCH.h"
 
 class Camera {
 private:

@@ -1,5 +1,4 @@
-#include <glew.h>
-#include <iostream>
+#include "PCH.h"
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 #define GLcall(function) GLClearError(); function; GLLogCall(#function, __FILE__, __LINE__);

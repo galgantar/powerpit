@@ -1,11 +1,9 @@
 #pragma once
 
-
-#include <fstream>
-#include <unordered_map>
-#include <gtc/type_ptr.hpp>
+#include "PCH.h"
 
 #include "Shader.h"
+#include "SafeCall.h"
 
 
 void Shader::ParseFile(const char* filename, std::string& out)

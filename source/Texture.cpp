@@ -1,20 +1,28 @@
+#include "PCH.h"
+
 #include "Texture.h"
-
 #include "SafeCall.h"
-#include <glew.h>
-#include <stb_image.h>
 
-Texture::Texture(const char* filename, int format)
+
+Texture::Texture(const char* filename, bool needAlpha)
 {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // minifying
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // magnifying
 
+	int soilLoad, textureType;
+	if (needAlpha) {
+		soilLoad = SOIL_LOAD_RGBA;
+		textureType = GL_RGBA;
+	}
+	else {
+		soilLoad = SOIL_LOAD_RGB;
+		textureType = GL_RGB;
+	}
 
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
+	int width, height;
+	unsigned char* data = SOIL_load_image(filename, &width, &height, nullptr, soilLoad);
 	if (!data) {
 		std::cout << "Texture source for " << filename << " not found!" << std::endl;
 	}
@@ -22,10 +30,10 @@ Texture::Texture(const char* filename, int format)
 
 	GLcall(glGenTextures(1, &id));
 	GLcall(glBindTexture(GL_TEXTURE_2D, id));
-	GLcall(glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data));
+	GLcall(glTexImage2D(GL_TEXTURE_2D, 0, textureType, width, height, 0, textureType, GL_UNSIGNED_BYTE, data));
 	GLcall(glGenerateMipmap(GL_TEXTURE_2D));
 
-	stbi_image_free(data);
+	SOIL_free_image_data(data);
 	Unbind();
 }
 

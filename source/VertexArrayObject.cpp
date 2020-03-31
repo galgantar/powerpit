@@ -1,7 +1,8 @@
+#include "PCH.h"
+
 #include "VertexArrayObject.h"
 #include "SafeCall.h"
 
-#include <glew.h>
 
 void VertexArrayObject::Build()
 {
@@ -16,11 +17,11 @@ void VertexArrayObject::Build()
 	delete attributes;
 	attributes = nullptr;
 
-	isBuild = true;
+	isBuilt = true;
 }
 
 VertexArrayObject::VertexArrayObject()
-	: stride(0), isBuild(false)
+	: stride(0), isBuilt(false)
 {
 	attributes = new std::vector<VertexAttribute>();
 	
@@ -51,7 +52,7 @@ void VertexArrayObject::AddVertexAttribute(const int location, const int count, 
 
 void VertexArrayObject::Bind()
 {
-	if (!isBuild)
+	if (!isBuilt)
 		Build();
 	
 	GLcall(glBindVertexArray(id));

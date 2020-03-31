@@ -1,6 +1,6 @@
-#include "Camera.h"
+#include "PCH.h"
 
-#include <glm.hpp>
+#include "Camera.h"
 
 
 void Camera::CalculateCameraVectors()

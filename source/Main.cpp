@@ -1,24 +1,10 @@
-#define GLEW_STATIC
-#define STB_IMAGE_IMPLEMENTATION
-
-#include <glew.h>
-#include <glfw3.h>
-
-#include <glm.hpp>
-#include <vec3.hpp>
-#include <vec4.hpp>
-#include <gtc/type_ptr.hpp>
-#include <gtc/matrix_transform.hpp>
-
-#include <stb_image.h>
+#include "PCH.h"
 
 #include "VertexArrayObject.h"
 #include "SafeCall.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
-
-#include <iostream>
 
 void FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -97,8 +83,8 @@ int main()
 
     Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader");
     
-    Texture* texture = new Texture("assets/textures/awesomeface.png", GL_RGBA);
-    Texture* texture2 = new Texture("assets/textures/container.jpg", GL_RGB);
+    Texture* texture = new Texture("assets/textures/awesomeface.png", true);
+    Texture* texture2 = new Texture("assets/textures/container.jpg", false);
 
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,

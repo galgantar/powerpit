@@ -1,14 +1,6 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
-#include <glew.h>
-
-#include <glm.hpp>
-#include <vec3.hpp>
-#include <vec4.hpp>
-
-#include "SafeCall.h"
+#include "PCH.h"
 
 class Shader {
 private:
