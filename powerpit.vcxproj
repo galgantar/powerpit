@@ -25,6 +25,7 @@
     <ClCompile Include="source\SafeCall.h" />
     <ClCompile Include="source\Shader.cpp" />
     <ClCompile Include="source\Texture.cpp" />
+    <ClCompile Include="source\VertexArrayObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -36,6 +37,7 @@
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\Shader.h" />
     <ClInclude Include="source\Texture.h" />
+    <ClInclude Include="source\VertexArrayObject.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
