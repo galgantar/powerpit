@@ -23,6 +23,13 @@ void FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+float CalculateDeltaTime(float& prevTime)
+{
+    float newTime = glfwGetTime();
+    float deltaTime = newTime - prevTime;
+    prevTime = newTime;
+    return deltaTime;
+}
 
 void ProcessInput(GLFWwindow* window, Camera* camera, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE))
@@ -39,10 +46,22 @@ void ProcessInput(GLFWwindow* window, Camera* camera, float deltaTime) {
         camera->MoveRight(deltaTime);
 }
 
+void ProcessMouseInput(GLFWwindow* window, Camera* camera, float deltaTime, double& lastMouseX, double& lastMouseY)
+{
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+    camera->Pitch((mouseY - lastMouseY) * -1.f, deltaTime); // y is reversed in glfw
+    camera->Yaw(mouseX - lastMouseX, deltaTime);
+    
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+}
+
 int main()
 {
-    int screenWidth = 800;
-    int screenHeight = 600;
+    int screenWidth = 1000;
+    int screenHeight = 800;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -144,7 +163,7 @@ glm::vec3 cubeTranslations[] = {
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
-    
+
     unsigned int VBO;
     GLcall(glGenBuffers(1, &VBO));
     GLcall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
@@ -188,17 +207,9 @@ glm::vec3 cubeTranslations[] = {
 
     while (!glfwWindowShouldClose(window))
     {
-        float newTime = glfwGetTime();
-        float deltaTime = newTime - time;
-        time = newTime;
-
-        double mouseX, mouseY;
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-        camera->Pitch(lastMouseY - mouseY); // reversed
-        camera->Yaw(mouseX - lastMouseX); 
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
+        float deltaTime = CalculateDeltaTime(time);
         
+        ProcessMouseInput(window, camera, deltaTime, lastMouseX, lastMouseY);
         ProcessInput(window, camera, deltaTime);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

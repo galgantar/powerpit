@@ -63,9 +63,9 @@ void Camera::MoveOnPos(const glm::vec3& newPosition)
 	position = newPosition;
 }
 
-void Camera::Pitch(const double offset)
+void Camera::Pitch(const double offset, float deltaTime)
 {
-	pitch += offset * sensitivity;
+	pitch += offset * sensitivity * deltaTime;
 
 	if (pitch > 90.f)
 		pitch = 90.f;
@@ -81,9 +81,9 @@ void Camera::Pitch(const double offset)
 	*/
 }
 
-void Camera::Yaw(const double offset)
+void Camera::Yaw(const double offset, float deltaTime)
 {
-	yaw += offset * sensitivity;
+	yaw += offset * sensitivity * deltaTime;
 
 	if (yaw > 360.f)
 		yaw -= 360.f;

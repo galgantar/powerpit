@@ -21,7 +21,7 @@ private:
 	void CalculateCameraVectors();
 
 public:
-	Camera(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& worldUp, const float speed=1.f, const float sensitivity=0.1f);
+	Camera(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& worldUp, const float speed=1.f, const float sensitivity=20.f);
 	~Camera() {};
 
 	void MoveFront(const float deltaTime);
@@ -33,8 +33,8 @@ public:
 	
 	void MoveOnPos(const glm::vec3& newPosition);
 
-	void Pitch(const double offset);
-	void Yaw(const double offset);
+	void Pitch(const double offset, float deltaTime);
+	void Yaw(const double offset, float deltaTime);
 
 	glm::mat4 GetViewMatrix();
 
