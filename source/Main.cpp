@@ -28,7 +28,7 @@ void ProcessInput(GLFWwindow* window, Camera* camera, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE))
         glfwSetWindowShouldClose(window, true);
 
-    // Camera
+    // Camera movement
     if (glfwGetKey(window, GLFW_KEY_W))
         camera->MoveFront(deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S))
@@ -39,9 +39,11 @@ void ProcessInput(GLFWwindow* window, Camera* camera, float deltaTime) {
         camera->MoveRight(deltaTime);
 }
 
-
 int main()
 {
+    int screenWidth = 800;
+    int screenHeight = 600;
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -50,7 +52,7 @@ int main()
 
     if (!glfwInit())
         return -1;
-    window = glfwCreateWindow(800, 600, "PowerPit", nullptr, nullptr);
+    window = glfwCreateWindow(screenWidth, screenHeight, "PowerPit", nullptr, nullptr);
     if (!window) {
         std::cout << "Window creation failed" << std::endl;
         glfwTerminate();
@@ -70,6 +72,7 @@ int main()
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
     Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader");
@@ -180,11 +183,21 @@ glm::vec3 cubeTranslations[] = {
     shader->SetUniformMat4f("projection", projection);
 
     float time = glfwGetTime();
+    double lastMouseX, lastMouseY;
+    glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
+
     while (!glfwWindowShouldClose(window))
     {
         float newTime = glfwGetTime();
         float deltaTime = newTime - time;
         time = newTime;
+
+        double mouseX, mouseY;
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+        camera->Pitch(lastMouseY - mouseY); // reversed
+        camera->Yaw(mouseX - lastMouseX); 
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
         
         ProcessInput(window, camera, deltaTime);
 

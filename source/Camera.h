@@ -11,12 +11,17 @@ private:
 	glm::vec3 front;
 	glm::vec3 right;
 
+	float yaw; // around y
+	float pitch; // around x
+	// float roll; // around z (currently not used)
+
 	float movementSpeed;
+	float sensitivity;
 
 	void CalculateCameraVectors();
 
 public:
-	Camera(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& worldUp, const float speed=1.f);
+	Camera(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& worldUp, const float speed=1.f, const float sensitivity=0.1f);
 	~Camera() {};
 
 	void MoveFront(const float deltaTime);
@@ -27,6 +32,9 @@ public:
 	void MoveDown(const float deltaTime);
 	
 	void MoveOnPos(const glm::vec3& newPosition);
+
+	void Pitch(const double offset);
+	void Yaw(const double offset);
 
 	glm::mat4 GetViewMatrix();
 
