@@ -172,17 +172,14 @@ int main()
 
     Camera* camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
-    glm::mat4 view = camera->GetViewMatrix();
+    glm::mat4 view;
 
     glm::mat4 model(1.0f);
-    model = glm::rotate(model, -3.14f / 3.f , glm::vec3(1.0f, 0.0f, 0.0f));
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 
-    shader->SetUniformMat4f("model", model);
-    shader->SetUniformMat4f("view", view);
     shader->SetUniformMat4f("projection", projection);
 
     float time = glfwGetTime();
@@ -199,6 +196,8 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        shader->SetUniformMat4f("view", camera->GetViewMatrix());
+
         // Draw
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
@@ -209,7 +208,6 @@ int main()
         
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-        shader->SetUniformMat4f("view", camera->GetViewMatrix());
 
         glfwSwapBuffers(window);
 

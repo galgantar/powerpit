@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include=".gitmodules" />
     <None Include="README.md" />
     <None Include="shaders\FragmentShader.shader" />
     <None Include="shaders\VertexShader.shader" />
