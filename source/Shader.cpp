@@ -110,14 +110,14 @@ void Shader::Unbind()
 	GLcall(glUseProgram(0));
 }
 
-void Shader::SetUniform4f(const std::string& name, const glm::vec4& value)
+void Shader::SetUniform4f(const std::string& name, const gm::vec4& value)
 {
 	int location = GetUniformLocation(name);
 	if (location != -1)
 		GLcall(glUniform4f(location, value.x, value.y, value.z, value.w));
 }
 
-void Shader::SetUniform3f(const std::string& name, const glm::vec3& value)
+void Shader::SetUniform3f(const std::string& name, const gm::vec3& value)
 {
 	int location = GetUniformLocation(name);
 	if (location != -1)
@@ -131,9 +131,9 @@ void Shader::SetUniform1i(const std::string& name, const int value)
 		GLcall(glUniform1i(location, value));
 }
 
-void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& value)
+void Shader::SetUniformMat4f(const std::string& name, const gm::mat4& value)
 {
 	int location = GetUniformLocation(name);
 	if (location != -1)
-		GLcall(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value)));
+		GLcall(glUniformMatrix4fv(location, 1, GL_TRUE, gm::value_ptr(value)));
 }
