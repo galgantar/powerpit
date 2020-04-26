@@ -1,3 +1,0 @@
-D:/0_Gal/Programiranje/Repositories/powerpit/dependencies/GLM/include/out/build/x64-Debug/CMakeFiles/glm_dummy.dir
-D:/0_Gal/Programiranje/Repositories/powerpit/dependencies/GLM/include/out/build/x64-Debug/CMakeFiles/edit_cache.dir
-D:/0_Gal/Programiranje/Repositories/powerpit/dependencies/GLM/include/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir

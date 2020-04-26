@@ -40,11 +40,20 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include=".gitmodules" />
+    <None Include="dependencies\gmath\.gitignore" />
+    <None Include="dependencies\gmath\README.md" />
     <None Include="README.md" />
     <None Include="shaders\FragmentShader.shader" />
     <None Include="shaders\VertexShader.shader" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dependencies\gmath\gmath.h" />
+    <ClInclude Include="dependencies\gmath\Matrix.hpp" />
+    <ClInclude Include="dependencies\gmath\MatrixTransform.hpp" />
+    <ClInclude Include="dependencies\gmath\Projections.hpp" />
+    <ClInclude Include="dependencies\gmath\Vector2.hpp" />
+    <ClInclude Include="dependencies\gmath\Vector3.hpp" />
+    <ClInclude Include="dependencies\gmath\Vector4.hpp" />
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\PCH.h" />
     <ClInclude Include="source\Shader.h" />
@@ -128,7 +137,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLM\include\;$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\GLEW\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -147,7 +156,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLM\include\;$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\GLEW\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -168,7 +177,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLM\include\;$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\GLEW\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -191,7 +200,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLM\include\;$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\GLEW\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
     </ClCompile>
