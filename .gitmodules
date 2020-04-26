@@ -1,0 +1,6 @@
+[submodule "gmath"]
+	path = gmath
+	url = https://github.com/galgantar/gmath.git
+[submodule "dependencies/gmath"]
+	path = dependencies/gmath
+	url = https://github.com/galgantar/gmath
