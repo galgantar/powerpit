@@ -6,6 +6,9 @@
 #include "Texture.h"
 #include "Camera.h"
 
+// Later added to PCH
+#include "gmath.h"
+
 void FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
