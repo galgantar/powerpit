@@ -5,16 +5,16 @@
 
 void Camera::CalculateCameraVectors()
 {
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.x = cos(gm::radians(yaw)) * cos(gm::radians(pitch));
+	front.y = sin(gm::radians(pitch));
+	front.z = sin(gm::radians(yaw)) * cos(gm::radians(pitch));
 
-	front = glm::normalize(front);
-	right = glm::normalize(glm::cross(worldUp, front));
-	up = glm::normalize(glm::cross(front, right));
+	front = gm::normalize(front);
+	right = gm::normalize(gm::cross(worldUp, front));
+	up = gm::normalize(gm::cross(front, right));
 }
 
-Camera::Camera(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& worldUp, const float speed, const float sensitivity)
+Camera::Camera(const gm::vec3& position, const gm::vec3& direction, const gm::vec3& worldUp, const float speed, const float sensitivity)
 	:
 	worldUp(worldUp),
 	position(position),
@@ -58,7 +58,7 @@ void Camera::MoveDown(const float deltaTime)
 	position -= up * movementSpeed * deltaTime;
 }
 
-void Camera::MoveOnPos(const glm::vec3& newPosition)
+void Camera::MoveOnPos(const gm::vec3& newPosition)
 {
 	position = newPosition;
 }
@@ -89,9 +89,9 @@ void Camera::Yaw(const double offset, float deltaTime)
 		yaw -= 360.f;
 }
 
-glm::mat4 Camera::GetViewMatrix()
+gm::mat4 Camera::GetViewMatrix()
 {
 	CalculateCameraVectors();
 	
-	return glm::lookAt(position, position + front, up);
+	return gm::lookAt(position, position + front, up);
 }

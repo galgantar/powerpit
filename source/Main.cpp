@@ -6,8 +6,6 @@
 #include "Texture.h"
 #include "Camera.h"
 
-// Later added to PCH
-#include "gmath.h"
 
 void FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -173,7 +171,7 @@ int main()
     shader->SetUniform1i("smiley", 0);
     shader->SetUniform1i("box", 1);
 
-    Camera* camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    Camera* camera = new Camera(gm::vec3(0.0f, 0.0f, 3.0f), gm::vec3(0.0f, 0.0f, -1.0f), gm::vec3(0.0f, 1.0f, 0.0f));
     
     glm::mat4 view;
 
@@ -199,7 +197,8 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shader->SetUniformMat4f("view", camera->GetViewMatrix());
+        glUniformMatrix4fv(glGetUniformLocation(shader->id, "view"), 1, GL_TRUE, gm::value_ptr(camera->GetViewMatrix()));
+        //shader->SetUniformMat4f("view", camera->GetViewMatrix());
 
         // Draw
         for (int i = 0; i < 10; ++i) {

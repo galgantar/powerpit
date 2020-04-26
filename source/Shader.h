@@ -3,8 +3,9 @@
 #include "PCH.h"
 
 class Shader {
-private:
+public: // remove later
 	unsigned int id;
+private:
 	std::unordered_map<std::string, int> uniforms;
 
 	void ParseFile(const char* filename, std::string& out);

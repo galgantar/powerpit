@@ -40,11 +40,20 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include=".gitmodules" />
+    <None Include="dependencies\gmath\.gitignore" />
+    <None Include="dependencies\gmath\README.md" />
     <None Include="README.md" />
     <None Include="shaders\FragmentShader.shader" />
     <None Include="shaders\VertexShader.shader" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dependencies\gmath\gmath.h" />
+    <ClInclude Include="dependencies\gmath\Matrix.hpp" />
+    <ClInclude Include="dependencies\gmath\MatrixTransform.hpp" />
+    <ClInclude Include="dependencies\gmath\Projections.hpp" />
+    <ClInclude Include="dependencies\gmath\Vector2.hpp" />
+    <ClInclude Include="dependencies\gmath\Vector3.hpp" />
+    <ClInclude Include="dependencies\gmath\Vector4.hpp" />
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\PCH.h" />
     <ClInclude Include="source\Shader.h" />
