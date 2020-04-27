@@ -25,6 +25,30 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="dependencies\SOIL2\src\SOIL2\image_DXT.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="dependencies\SOIL2\src\SOIL2\image_helper.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="dependencies\SOIL2\src\SOIL2\SOIL2.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="dependencies\SOIL2\src\SOIL2\wfETC.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\Main.cpp" />
     <ClCompile Include="source\PCH.cpp">
@@ -60,6 +84,23 @@
     <ClInclude Include="dependencies\gmath\Vector2.hpp" />
     <ClInclude Include="dependencies\gmath\Vector3.hpp" />
     <ClInclude Include="dependencies\gmath\Vector4.hpp" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\image_DXT.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\image_helper.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\jo_jpeg.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\pkm_helper.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\pvr_helper.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\SOIL2.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stbi_DDS.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stbi_DDS_c.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stbi_ext.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stbi_ext_c.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stbi_pkm.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stbi_pkm_c.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stbi_pvr.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stbi_pvr_c.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stb_image.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\stb_image_write.h" />
+    <ClInclude Include="dependencies\SOIL2\src\SOIL2\wfETC.h" />
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\PCH.h" />
     <ClInclude Include="source\Shader.h" />
@@ -143,15 +184,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\;$(SolutionDir)dependencies\glad\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\;$(SolutionDir)dependencies\glad\include\;$(SolutionDir)dependencies\SOIL2\src\SOIL2\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>soil2.lib;glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\SOIL\lib;$(SolutionDir)dependencies\GLFW\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\GLFW\lib</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <LinkStatus>true</LinkStatus>
     </Link>
@@ -162,15 +203,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\;$(SolutionDir)dependencies\glad\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\;$(SolutionDir)dependencies\glad\include\;$(SolutionDir)dependencies\SOIL2\src\SOIL2\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>soil2.lib;glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\SOIL\lib;$(SolutionDir)dependencies\GLFW\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\GLFW\lib</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <LinkStatus>true</LinkStatus>
     </Link>
@@ -183,7 +224,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\;$(SolutionDir)dependencies\glad\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\;$(SolutionDir)dependencies\glad\include\;$(SolutionDir)dependencies\SOIL2\src\SOIL2\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -192,8 +233,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>soil2.lib;glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\SOIL\lib;$(SolutionDir)dependencies\GLFW\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\GLFW\lib</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <LinkStatus>true</LinkStatus>
     </Link>
@@ -206,7 +247,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLEMENTATION</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\SOIL\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\;$(SolutionDir)dependencies\glad\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLFW\include\;$(SolutionDir)dependencies\gmath\;$(SolutionDir)dependencies\GLEW\include\;$(SolutionDir)dependencies\glad\include\;$(SolutionDir)dependencies\SOIL2\src\SOIL2\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -215,8 +256,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>soil2.lib;glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\SOIL\lib;$(SolutionDir)dependencies\GLFW\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\GLFW\lib</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <LinkStatus>true</LinkStatus>
     </Link>
