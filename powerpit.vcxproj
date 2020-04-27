@@ -99,7 +99,6 @@
     <ClInclude Include="dependencies\glfw\src\osmesa_context.h" />
     <ClInclude Include="dependencies\glfw\src\wgl_context.h" />
     <ClInclude Include="dependencies\glfw\src\win32_joystick.h" />
-    <ClInclude Include="dependencies\glfw\src\win32_platform.h" />
     <ClInclude Include="dependencies\gmath\gmath.h" />
     <ClInclude Include="dependencies\gmath\Matrix.hpp" />
     <ClInclude Include="dependencies\gmath\MatrixTransform.hpp" />
