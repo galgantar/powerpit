@@ -2,10 +2,9 @@
 Graphics rendering engine based on OpenGL.
 
 ## Current features
-* well... it draws a cube
+* Custom math library for vector transformations
 
 ## Plans for the future
-* Custom math library for vector transformations
 * Lights (diffuse, spectral)
 * Materials
 * Meshes
