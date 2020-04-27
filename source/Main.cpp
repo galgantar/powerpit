@@ -69,12 +69,9 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, FramebufferResizeCallback);
 
-
-    glewExperimental = GL_TRUE;
-
-    if (glewInit() != GLEW_OK) {
-        std::cout << "Error [Main.cpp::main] GLEW_INIT_FAILED" << std::endl;
-        glfwTerminate();
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "Failed to initialize glad" << std::endl;
+        return -1;
     }
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -180,7 +177,7 @@ int main()
     shader->SetUniformMat4f("projection", projection);
 
 
-    float time = glfwGetTime();
+    float time = (float)glfwGetTime();
     double lastMouseX, lastMouseY;
     glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
 

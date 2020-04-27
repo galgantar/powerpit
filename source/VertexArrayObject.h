@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glew.h>
-#include <vector>
+#include "PCH.h"
+
 
 struct VertexAttribute
 {

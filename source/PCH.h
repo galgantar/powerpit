@@ -1,7 +1,9 @@
 #pragma once
 
-#define GLEW_STATIC
-#include <glew.h>
+//#define GLEW_STATIC
+//#include <glew.h>
+
+#include <glad/glad.h>
 
 #include <glfw3.h>
 
