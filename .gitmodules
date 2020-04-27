@@ -1,3 +1,6 @@
 [submodule "dependencies/gmath"]
 	path = dependencies/gmath
 	url = https://github.com/galgantar/gmath
+[submodule "dependencies/SOIL2"]
+	path = dependencies/SOIL2
+	url = https://github.com/SpartanJ/SOIL2
