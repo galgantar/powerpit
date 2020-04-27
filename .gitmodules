@@ -4,6 +4,6 @@
 [submodule "dependencies/SOIL2"]
 	path = dependencies/SOIL2
 	url = https://github.com/SpartanJ/SOIL2
-[submodule "dependencies/glfw2"]
-	path = dependencies/glfw2
+[submodule "dependencies/glfw"]
+	path = dependencies/glfw
 	url = https://github.com/glfw/glfw
