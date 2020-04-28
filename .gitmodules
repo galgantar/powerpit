@@ -1,9 +1,9 @@
 [submodule "powerpit/dependencies/gmath"]
-	path = powerpit/dependencies/gmath
+	path = powerpit/vendor/gmath
 	url = https://github.com/galgantar/gmath
 [submodule "powerpit/dependencies/SOIL2"]
-	path = powerpit/dependencies/SOIL2
+	path = powerpit/vendor/SOIL2
 	url = https://github.com/SpartanJ/SOIL2
 [submodule "powerpit/dependencies/glfw"]
-	path = powerpit/dependencies/glfw
+	path = powerpit/vendor/glfw
 	url = https://github.com/glfw/glfw
