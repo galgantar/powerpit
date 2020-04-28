@@ -7,6 +7,7 @@
 #include <glfw3.h>
 
 #include <SOIL2.h>
+//#include <stb_image.h>
 
 #include <iostream>
 #include <fstream>
