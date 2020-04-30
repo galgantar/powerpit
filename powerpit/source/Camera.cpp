@@ -93,5 +93,5 @@ gm::mat4 Camera::GetViewMatrix()
 {
 	CalculateCameraVectors();
 	
-	return gm::lookAt(position, position + front, up);
+	return gm::lookAt(position, position + front, worldUp);
 }

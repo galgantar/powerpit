@@ -23,8 +23,6 @@ private:
 	std::vector<VertexAttribute>* attributes;
 	bool isBuilt;
 
-	void Build();
-
 public:
 	/* Binds VAO on initialization */
 	VertexArrayObject();
@@ -32,7 +30,7 @@ public:
 
 	void AddVertexAttribute(const int location, const int count, GLenum type, GLenum normalized); 
 	
-	/* Bind MUST be called after last call of AddVertexAttribute() */
+	void Build();
 	void Bind();
 	void Unbind();
 };

@@ -26,6 +26,8 @@ public:
 	Camera(const gm::vec3& position, const gm::vec3& direction, const gm::vec3& worldUp, const float speed=1.f, const float sensitivity=20.f);
 	~Camera() {};
 
+	gm::vec3 GetPosition() { return position; };
+
 	void MoveFront(const float deltaTime);
 	void MoveBack(const float deltaTime);
 	void MoveLeft(const float deltaTime);

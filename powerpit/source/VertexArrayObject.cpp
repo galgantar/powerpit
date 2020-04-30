@@ -5,22 +5,6 @@
 #include "SafeCall.h"
 
 
-void VertexArrayObject::Build()
-{
-	GLcall(glBindVertexArray(id));
-
-	for (const VertexAttribute& att : *attributes) {
-		GLcall(glVertexAttribPointer(att.location, att.count, att.type, att.normalized, stride, (void*)att.offset));
-		
-		GLcall(glEnableVertexAttribArray(att.location));
-	}
-
-	delete attributes;
-	attributes = nullptr;
-
-	isBuilt = true;
-}
-
 VertexArrayObject::VertexArrayObject()
 	: stride(0), isBuilt(false)
 {
@@ -28,7 +12,7 @@ VertexArrayObject::VertexArrayObject()
 	
 	glGenVertexArrays(1, &id);
 	
-	GLcall(glBindVertexArray(id));
+	Bind();
 }
 
 VertexArrayObject::~VertexArrayObject()
@@ -51,11 +35,24 @@ void VertexArrayObject::AddVertexAttribute(const int location, const int count, 
 	attributes->push_back({ location, count, type, normalized, offset});
 }
 
-void VertexArrayObject::Bind()
+void VertexArrayObject::Build()
 {
-	if (!isBuilt)
-		Build();
-	
+	GLcall(glBindVertexArray(id));
+
+	for (const VertexAttribute& att : *attributes) {		
+		GLcall(glVertexAttribPointer(att.location, att.count, att.type, att.normalized, stride, (void*)att.offset));
+
+		GLcall(glEnableVertexAttribArray(att.location));
+	}
+
+	delete attributes;
+	attributes = nullptr;
+
+	isBuilt = true;
+}
+
+void VertexArrayObject::Bind()
+{	
 	GLcall(glBindVertexArray(id));
 }
 
