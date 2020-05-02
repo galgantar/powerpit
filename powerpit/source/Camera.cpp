@@ -14,7 +14,7 @@ void Camera::CalculateCameraVectors()
 	up = gm::normalize(gm::cross(front, right));
 }
 
-Camera::Camera(const gm::vec3& position, const gm::vec3& direction, const gm::vec3& worldUp, const float speed, const float sensitivity)
+Camera::Camera(const gm::vec3& position, const gm::vec3& worldUp, const float speed, const float sensitivity)
 	:
 	worldUp(worldUp),
 	position(position),
@@ -22,7 +22,9 @@ Camera::Camera(const gm::vec3& position, const gm::vec3& direction, const gm::ve
 	sensitivity(sensitivity),
 	yaw(-90.f),
 	pitch(0.f)
-{}
+{
+	CalculateCameraVectors();
+}
 
 void Camera::MoveFront(const float deltaTime)
 {

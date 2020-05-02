@@ -23,7 +23,6 @@ Texture::Texture(const char* filename, bool needAlpha)
 
 	int width, height, nrChannels;
 	unsigned char* data = SOIL_load_image(filename, &width, &height, nullptr, soilLoad);
-	// unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
 	
 	if (!data) {
 		std::cout << "Texture source for " << filename << " not found!" << std::endl;
@@ -36,7 +35,6 @@ Texture::Texture(const char* filename, bool needAlpha)
 	GLcall(glGenerateMipmap(GL_TEXTURE_2D));
 
 	SOIL_free_image_data(data);
-	//stbi_image_free(data);
 	Unbind();
 }
 

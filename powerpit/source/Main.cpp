@@ -82,8 +82,11 @@ int main()
     Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader");
     Shader* lightShader = new Shader("shaders/LightSourceVertex.shader", "shaders/LightSourceFragment.shader");
 
-    Texture* texture = new Texture("assets/textures/awesomeface.png", true);
-    Texture* texture2 = new Texture("assets/textures/container.jpg", false);
+    /*Texture* texture = new Texture("assets/textures/awesomeface.png", true);
+    Texture* texture2 = new Texture("assets/textures/container.jpg", false);*/
+
+    Texture* diffMapTex = new Texture("assets/textures/container.png", true);
+    Texture* specMapTex = new Texture("assets/textures/container_spec_map.png", true);
 
     float modelVertices[] = {
         // Position              // Normals           // TexCoord
@@ -213,19 +216,51 @@ int main()
     lightVAO->Build();
     lightVAO->Unbind();
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
 
-    shader->Bind();
-    shader->SetUniform3f("objectColor", { 1.0f, 0.5f, 0.31f });
-    shader->SetUniform3f("lightColor", { 1.f, 1.f, 1.f });
+    diffMapTex->Bind(0);
+    specMapTex->Bind(1);
 
-    gm::vec3 lightPos(-1.7f, 0.0f, -1.f);
+    shader->SetUniform1i("material.diffuseMap", 0);
+    shader->SetUniform1i("material.specularMap", 1);
+    shader->SetUniform1f("material.shininess", 32.f);
 
-    shader->SetUniform3f("lightPos", lightPos); // uniforms are the same across shaders
+    Camera* camera = new Camera(gm::vec3(0.0f, 0.0f, 3.0f), gm::vec3(0.0f, 1.0f, 0.0f));
 
-    gm::mat4 light_model = gm::translate(gm::mat4(1.f), lightPos);
-    light_model = gm::scale(light_model, gm::vec3(0.2f));
+    gm::vec3 pointLightPositions[] = {
+        gm::vec3(0.7f,  0.2f,  2.0f),
+        gm::vec3(2.3f, -3.3f, -4.0f),
+        gm::vec3(-4.0f,  2.0f, -12.0f),
+        gm::vec3(0.0f,  0.0f, -3.0f)
+    };
 
-    Camera* camera = new Camera(gm::vec3(0.0f, 0.0f, 3.0f), gm::vec3(0.0f, 0.0f, -1.0f), gm::vec3(0.0f, 1.0f, 0.0f));
+    // Directional light
+    shader->SetUniform3f("dirLight.direction", { 0.f, -1.f, 0.f });
+    shader->SetUniform3f("dirLight.ambient", { 0.05f, 0.05f, 0.05f });
+    shader->SetUniform3f("dirLight.diffuse", { 0.4f, 0.4f, 0.4f });
+    shader->SetUniform3f("dirLight.specular", { 0.5f, 0.5f, 0.5f });
+
+    // Point lights
+    for (int i = 0; i < 4; ++i) {
+        std::string lightIndex = "pointLights[" + std::to_string(i) + "]";
+        shader->SetUniform3f(lightIndex + ".position", pointLightPositions[i]);
+        shader->SetUniform3f(lightIndex + ".ambient", { 0.05f, 0.05f, 0.05f });
+        shader->SetUniform3f(lightIndex + ".diffuse", { 0.8f, 0.8f, 0.8f });
+        shader->SetUniform3f(lightIndex + ".specular", { 1.0f, 1.0f, 1.0f });
+        shader->SetUniform1f(lightIndex + ".quadratic_val", 0.032f);
+        shader->SetUniform1f(lightIndex + ".linear_val", 0.09f);
+        shader->SetUniform1f(lightIndex + ".constant_val", 1.0f);
+    }
+
+
+    /*shader->SetUniform3f("light.position", camera->GetPosition());
+    shader->SetUniform3f("light.direction", camera->GetFront());
+    shader->SetUniform1f("light.innerCutoff", gm::cos(gm::radians(12.5f)));
+    shader->SetUniform1f("light.outerCutoff", gm::cos(gm::radians(17.5f)));*/
+
+
+    // gm::mat4 light_model = gm::translate(gm::mat4(1.f), lightPos);
+    // light_model = gm::scale(light_model, gm::vec3(0.2f));
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
@@ -233,7 +268,6 @@ int main()
     gm::mat4 projection = gm::perspective(gm::radians(60.0f), (float)width / height, 0.1f, 100.0f);
     shader->SetUniformMat4f("projection", projection);
     lightShader->SetUniformMat4f("projection", projection);
-
 
     float time = (float)glfwGetTime();
     double lastMouseX, lastMouseY;
@@ -252,13 +286,20 @@ int main()
         gm::mat4 view =  camera->GetViewMatrix();
         shader->SetUniformMat4f("view", view);
         shader->SetUniform3f("viewPos", camera->GetPosition());
+        //shader->SetUniform3f("light.position", camera->GetPosition());
+        //shader->SetUniform3f("light.direction", camera->GetFront());
         lightShader->SetUniformMat4f("view", view);
 
         // Draw
-        lightShader->SetUniformMat4f("model", light_model);
-        lightShader->Bind();
+        
         lightVAO->Bind();
-        GLcall(glDrawArrays(GL_TRIANGLES, 0, 36));
+        for (int i = 0; i < 4; ++i) {
+            gm::mat4 light_model = gm::translate(gm::mat4(1.f), pointLightPositions[i]);
+            light_model = gm::scale(light_model, gm::vec3(0.2f));
+            lightShader->SetUniformMat4f("model", light_model);
+            lightShader->Bind();
+            GLcall(glDrawArrays(GL_TRIANGLES, 0, 36));
+        }
 
         VAO->Bind();
         for (int i = 0; i < 10; ++i) {
@@ -282,8 +323,11 @@ int main()
 
     // important for clean termination
     delete shader;
-    delete texture;
+    delete lightShader;
+    delete diffMapTex;
+    delete specMapTex;
     delete VAO;
+    delete lightVAO;
 
     glfwTerminate();
     return 0;
