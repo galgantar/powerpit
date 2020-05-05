@@ -240,24 +240,29 @@ int main()
     shader->SetUniform3f("dirLight.diffuse", { 0.4f, 0.4f, 0.4f });
     shader->SetUniform3f("dirLight.specular", { 0.5f, 0.5f, 0.5f });
 
+    // Spot light
+    shader->SetUniform3f("spotLight.ambient", { 0.05f, 0.05f, 0.05f });
+    shader->SetUniform3f("spotLight.diffuse", { 0.4f, 0.4f, 0.4f });
+    shader->SetUniform3f("spotLight.specular", { 0.5f, 0.5f, 0.5f });
+    shader->SetUniform3f("spotLight.position", camera->GetPosition());
+    shader->SetUniform3f("spotLight.direction", camera->GetFront());
+    shader->SetUniform1f("spotLight.innerCutoff", gm::cos(gm::radians(12.5f)));
+    shader->SetUniform1f("spotLight.outerCutoff", gm::cos(gm::radians(17.5f)));
+    shader->SetUniform1f("spotLight.quadratic_val", 0.032f);
+    shader->SetUniform1f("spotLight.linear_val", 0.09f);
+    shader->SetUniform1f("spotLight.constant_val", 1.0f);
+
     // Point lights
     for (int i = 0; i < 4; ++i) {
         std::string lightIndex = "pointLights[" + std::to_string(i) + "]";
         shader->SetUniform3f(lightIndex + ".position", pointLightPositions[i]);
         shader->SetUniform3f(lightIndex + ".ambient", { 0.05f, 0.05f, 0.05f });
-        shader->SetUniform3f(lightIndex + ".diffuse", { 0.8f, 0.8f, 0.8f });
+        shader->SetUniform3f(lightIndex + ".diffuse", { 0.9f, 0.9f, 0.9f });
         shader->SetUniform3f(lightIndex + ".specular", { 1.0f, 1.0f, 1.0f });
         shader->SetUniform1f(lightIndex + ".quadratic_val", 0.032f);
         shader->SetUniform1f(lightIndex + ".linear_val", 0.09f);
         shader->SetUniform1f(lightIndex + ".constant_val", 1.0f);
     }
-
-
-    /*shader->SetUniform3f("light.position", camera->GetPosition());
-    shader->SetUniform3f("light.direction", camera->GetFront());
-    shader->SetUniform1f("light.innerCutoff", gm::cos(gm::radians(12.5f)));
-    shader->SetUniform1f("light.outerCutoff", gm::cos(gm::radians(17.5f)));*/
-
 
     // gm::mat4 light_model = gm::translate(gm::mat4(1.f), lightPos);
     // light_model = gm::scale(light_model, gm::vec3(0.2f));
@@ -280,18 +285,19 @@ int main()
         ProcessMouseInput(window, camera, deltaTime, lastMouseX, lastMouseY);
         ProcessInput(window, camera, deltaTime);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         gm::mat4 view =  camera->GetViewMatrix();
         shader->SetUniformMat4f("view", view);
         shader->SetUniform3f("viewPos", camera->GetPosition());
-        //shader->SetUniform3f("light.position", camera->GetPosition());
-        //shader->SetUniform3f("light.direction", camera->GetFront());
         lightShader->SetUniformMat4f("view", view);
-
-        // Draw
         
+        // Spot light
+        shader->SetUniform3f("spotLight.position", camera->GetPosition());
+        shader->SetUniform3f("spotLight.direction", camera->GetFront());
+      
+        // Draw  
         lightVAO->Bind();
         for (int i = 0; i < 4; ++i) {
             gm::mat4 light_model = gm::translate(gm::mat4(1.f), pointLightPositions[i]);
