@@ -5,7 +5,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
-
+#include "Model.h"
 
 void FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -48,8 +48,8 @@ void ProcessMouseInput(GLFWwindow* window, Camera* camera, float deltaTime, doub
 
 int main()
 {
-    int screenWidth = 1000;
-    int screenHeight = 800;
+    int screenWidth = 1200;
+    int screenHeight = 1000;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -82,56 +82,10 @@ int main()
     Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader");
     Shader* lightShader = new Shader("shaders/LightSourceVertex.shader", "shaders/LightSourceFragment.shader");
 
-    /*Texture* texture = new Texture("assets/textures/awesomeface.png", true);
-    Texture* texture2 = new Texture("assets/textures/container.jpg", false);*/
+    Camera* camera = new Camera(gm::vec3(0.0f, 0.0f, 3.0f), gm::vec3(0.0f, 1.0f, 0.0f));
 
-    Texture* diffMapTex = new Texture("assets/textures/container.png", true);
-    Texture* specMapTex = new Texture("assets/textures/container_spec_map.png", true);
+    Model* backpack = new Model("assets/models/backpack/backpack.obj");
 
-    float modelVertices[] = {
-        // Position              // Normals           // TexCoord
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
-                                                       
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f, 1.0f,     0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-                                                       
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 1.0f,
-    };
     float plainVertices[] = {
         -0.5f, -0.5f, -0.5f,
          0.5f, -0.5f, -0.5f,
@@ -175,64 +129,17 @@ int main()
         -0.5f,  0.5f,  0.5f,
         -0.5f,  0.5f, -0.5f,
     };
-
-
-
-    gm::vec3 cubeTranslations[] = {
-        gm::vec3(0.0f,  0.0f,  0.0f),
-        gm::vec3(2.0f,  5.0f, -15.0f),
-        gm::vec3(-1.5f, -2.2f, -2.5f),
-        gm::vec3(-3.8f, -2.0f, -12.3f),
-        gm::vec3(2.4f, -0.4f, -3.5f),
-        gm::vec3(-1.7f,  3.0f, -7.5f),
-        gm::vec3(1.3f, -2.0f, -2.5f),
-        gm::vec3(1.5f,  2.0f, -2.5f),
-        gm::vec3(1.5f,  0.2f, -1.5f),
-        gm::vec3(-1.3f,  1.0f, -1.5f)
-    };
-
-    // VAO has to be bound before VBO and EBO
-    VertexArrayObject* VAO = new VertexArrayObject();
-    VAO->Bind();
-    unsigned int VBO;
-    GLcall(glGenBuffers(1, &VBO));
-    GLcall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-    GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(modelVertices), modelVertices, GL_STATIC_DRAW));
-
-    VAO->AddVertexAttribute(0, 3, GL_FLOAT, GL_FALSE);
-    VAO->AddVertexAttribute(1, 3, GL_FLOAT, GL_FALSE);
-    VAO->AddVertexAttribute(2, 2, GL_FLOAT, GL_FALSE);
-    VAO->Build();
-    VAO->Unbind();
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
-    VertexArrayObject* lightVAO = new VertexArrayObject();
-    unsigned int l_VBO;
+    unsigned int l_VAO, l_VBO, l_IBO;
+    GLcall(glGenVertexArrays(1, &l_VAO));
+    GLcall(glBindVertexArray(l_VAO));
     GLcall(glGenBuffers(1, &l_VBO));
     GLcall(glBindBuffer(GL_ARRAY_BUFFER, l_VBO));
     GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(plainVertices), plainVertices, GL_STATIC_DRAW));
+    GLcall(glEnableVertexAttribArray(0));
+    GLcall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+    GLcall(glBindVertexArray(0));
 
-    lightVAO->AddVertexAttribute(0, 3, GL_FLOAT, GL_FALSE);
-    lightVAO->Build();
-    lightVAO->Unbind();
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
 
-    diffMapTex->Bind(0);
-    specMapTex->Bind(1);
-
-    shader->SetUniform1i("material.diffuseMap", 0);
-    shader->SetUniform1i("material.specularMap", 1);
-    shader->SetUniform1f("material.shininess", 32.f);
-
-    Camera* camera = new Camera(gm::vec3(0.0f, 0.0f, 3.0f), gm::vec3(0.0f, 1.0f, 0.0f));
-
-    gm::vec3 pointLightPositions[] = {
-        gm::vec3(0.7f,  0.2f,  2.0f),
-        gm::vec3(2.3f, -3.3f, -4.0f),
-        gm::vec3(-4.0f,  2.0f, -12.0f),
-        gm::vec3(0.0f,  0.0f, -3.0f)
-    };
 
     // Directional light
     shader->SetUniform3f("dirLight.direction", { 0.f, -1.f, 0.f });
@@ -240,8 +147,8 @@ int main()
     shader->SetUniform3f("dirLight.diffuse", { 0.4f, 0.4f, 0.4f });
     shader->SetUniform3f("dirLight.specular", { 0.5f, 0.5f, 0.5f });
 
-    // Spot light
-    shader->SetUniform3f("spotLight.ambient", { 0.05f, 0.05f, 0.05f });
+    // Spotligt
+    /*shader->SetUniform3f("spotLight.ambient", { 0.8f, 0.8f, 0.8f });
     shader->SetUniform3f("spotLight.diffuse", { 0.4f, 0.4f, 0.4f });
     shader->SetUniform3f("spotLight.specular", { 0.5f, 0.5f, 0.5f });
     shader->SetUniform3f("spotLight.position", camera->GetPosition());
@@ -250,12 +157,12 @@ int main()
     shader->SetUniform1f("spotLight.outerCutoff", gm::cos(gm::radians(17.5f)));
     shader->SetUniform1f("spotLight.quadratic_val", 0.032f);
     shader->SetUniform1f("spotLight.linear_val", 0.09f);
-    shader->SetUniform1f("spotLight.constant_val", 1.0f);
+    shader->SetUniform1f("spotLight.constant_val", 1.0f);*/
 
-    // Point lights
+   // Point lights
     for (int i = 0; i < 4; ++i) {
         std::string lightIndex = "pointLights[" + std::to_string(i) + "]";
-        shader->SetUniform3f(lightIndex + ".position", pointLightPositions[i]);
+        shader->SetUniform3f(lightIndex + ".position", {-2.f, 0.f, 5.f * i});
         shader->SetUniform3f(lightIndex + ".ambient", { 0.05f, 0.05f, 0.05f });
         shader->SetUniform3f(lightIndex + ".diffuse", { 0.9f, 0.9f, 0.9f });
         shader->SetUniform3f(lightIndex + ".specular", { 1.0f, 1.0f, 1.0f });
@@ -264,59 +171,68 @@ int main()
         shader->SetUniform1f(lightIndex + ".constant_val", 1.0f);
     }
 
-    // gm::mat4 light_model = gm::translate(gm::mat4(1.f), lightPos);
-    // light_model = gm::scale(light_model, gm::vec3(0.2f));
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    
-    gm::mat4 projection = gm::perspective(gm::radians(60.0f), (float)width / height, 0.1f, 100.0f);
-    shader->SetUniformMat4f("projection", projection);
-    lightShader->SetUniformMat4f("projection", projection);
 
     float time = (float)glfwGetTime();
     double lastMouseX, lastMouseY;
     glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
 
+    gm::mat4 projection = gm::perspective(gm::radians(60.0f), (float)width / height, 0.1f, 100.0f);
+
+    float moveLight = 0;
+    bool up = true;
+
     while (!glfwWindowShouldClose(window))
     {
+        glClearColor(0.f, 0.f, 0.f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         float deltaTime = CalculateDeltaTime(time);
         
         ProcessMouseInput(window, camera, deltaTime, lastMouseX, lastMouseY);
         ProcessInput(window, camera, deltaTime);
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        gm::mat4 view = camera->GetViewMatrix();
 
-        gm::mat4 view =  camera->GetViewMatrix();
-        shader->SetUniformMat4f("view", view);
-        shader->SetUniform3f("viewPos", camera->GetPosition());
-        lightShader->SetUniformMat4f("view", view);
-        
-        // Spot light
         shader->SetUniform3f("spotLight.position", camera->GetPosition());
         shader->SetUniform3f("spotLight.direction", camera->GetFront());
-      
-        // Draw  
-        lightVAO->Bind();
-        for (int i = 0; i < 4; ++i) {
-            gm::mat4 light_model = gm::translate(gm::mat4(1.f), pointLightPositions[i]);
-            light_model = gm::scale(light_model, gm::vec3(0.2f));
-            lightShader->SetUniformMat4f("model", light_model);
-            lightShader->Bind();
-            GLcall(glDrawArrays(GL_TRIANGLES, 0, 36));
-        }
 
-        VAO->Bind();
-        for (int i = 0; i < 10; ++i) {
-            gm::mat4 model = gm::mat4(1.0f);
-            model = gm::translate(model, cubeTranslations[i]);
-            float angle = 20.0f * i;
-            model = gm::rotate(model, gm::vec3(1.0f, 0.3f, 0.5f), gm::radians(angle));
+        shader->SetUniformMat4f("view", view);
+        shader->SetUniformMat4f("projection", projection);
+
+        // Draw lights
+        lightShader->SetUniformMat4f("projection", projection);
+        lightShader->SetUniformMat4f("view", view);
+        lightShader->Bind();
+
+        if (up)
+            moveLight += 0.01f;
+        else
+            moveLight -= 0.01f;
+        if (moveLight < 0 || moveLight > 4.f)
+            up = !up;
+
+        GLcall(glBindVertexArray(l_VAO));
+        for (int i = 0; i < 4; ++i) {
+            std::string lightIndex = "pointLights[" + std::to_string(i) + "]";
+            shader->SetUniform3f(lightIndex + ".position", { moveLight - 2.f, 0.f, 5.f * i });
             
-            shader->SetUniformMat4f("model", model);
-            shader->Bind();
-            GLcall(glDrawArrays(GL_TRIANGLES, 0, 36));
+            gm::mat4 l_model = gm::translate(gm::mat4(1.f), { moveLight -2.f, 0.f, 5.f * i });
+            l_model = gm::scale(l_model, { 0.2f });
+            lightShader->SetUniformMat4f("model", l_model);
+            lightShader->Bind();
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        lightShader->Unbind();
+        GLcall(glBindVertexArray(0));
+
+        // Draw models
+        for (int i = 0; i < 10; ++i) {
+            gm::mat4 test_model = gm::translate(gm::mat4(1.f), { 0.f, 0.f, 4.f * i });
+            shader->SetUniformMat4f("model", test_model);
+            backpack->Draw(*shader);
         }
 
         glfwSwapBuffers(window);
@@ -324,17 +240,11 @@ int main()
         glfwPollEvents();
     }
     
-    GLcall(glDeleteBuffers(1, &VBO));
-    // GLcall(glDeleteBuffers(1, &EBO));
-
-    // important for clean termination
     delete shader;
     delete lightShader;
-    delete diffMapTex;
-    delete specMapTex;
-    delete VAO;
-    delete lightVAO;
-
+    delete camera;
+    delete backpack;
+    
     glfwTerminate();
     return 0;
 }

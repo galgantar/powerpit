@@ -2,7 +2,6 @@
 
 #include "PCH.h"
 
-
 struct VertexAttribute
 {
 	int location;

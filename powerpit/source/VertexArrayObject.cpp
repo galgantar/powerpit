@@ -8,9 +8,10 @@
 VertexArrayObject::VertexArrayObject()
 	: stride(0), isBuilt(false)
 {
+	std::cout << "constructing VAO" << std::endl;
 	attributes = new std::vector<VertexAttribute>();
 	
-	glGenVertexArrays(1, &id);
+	GLcall(glGenVertexArrays(1, &id));
 	
 	Bind();
 }
@@ -37,7 +38,7 @@ void VertexArrayObject::AddVertexAttribute(const int location, const int count, 
 
 void VertexArrayObject::Build()
 {
-	GLcall(glBindVertexArray(id));
+	Bind();
 
 	for (const VertexAttribute& att : *attributes) {		
 		GLcall(glVertexAttribPointer(att.location, att.count, att.type, att.normalized, stride, (void*)att.offset));

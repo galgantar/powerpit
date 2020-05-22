@@ -4,13 +4,50 @@
 #include "SafeCall.h"
 
 
-Texture::Texture(const char* filename, bool needAlpha)
+Texture::Texture(const std::string& path, bool needAlpha, const std::string& type)
+	: 
+		path(path),
+		aiType(type)
 {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // minifying
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // magnifying
 
+	LoadTextureFromFile(path, needAlpha);
+}
+
+Texture::Texture(const Texture& t)
+{
+	std::cout << "went wrong" << std::endl;
+	__debugbreak();
+}
+
+Texture& Texture::operator=(const Texture& t)
+{
+	std::cout << "went wrong" << std::endl;
+	__debugbreak();
+	return Texture("lala", true, "hopsasa");
+}
+
+
+Texture::Texture(Texture&& old) noexcept
+	: 
+	id(std::move(old.id)),
+	aiType(std::move(old.aiType)),
+	path(std::move(old.path))
+{
+	old.id = -1;
+}
+
+Texture::~Texture()
+{
+	if (id != -1)
+		GLcall(glDeleteTextures(1, &id));
+}
+
+void Texture::LoadTextureFromFile(const std::string& filename, bool needAlpha)
+{
 	int soilLoad, textureType;
 	if (needAlpha) {
 		soilLoad = SOIL_LOAD_RGBA;
@@ -22,10 +59,10 @@ Texture::Texture(const char* filename, bool needAlpha)
 	}
 
 	int width, height, nrChannels;
-	unsigned char* data = SOIL_load_image(filename, &width, &height, nullptr, soilLoad);
-	
+	unsigned char* data = SOIL_load_image(path.c_str(), &width, &height, nullptr, soilLoad);
+
 	if (!data) {
-		std::cout << "Texture source for " << filename << " not found!" << std::endl;
+		std::cout << "Texture source for " << path << " not found!" << std::endl;
 	}
 
 
@@ -36,11 +73,6 @@ Texture::Texture(const char* filename, bool needAlpha)
 
 	SOIL_free_image_data(data);
 	Unbind();
-}
-
-Texture::~Texture()
-{
-	GLcall(glDeleteTextures(1, &id));
 }
 
 void Texture::Bind(unsigned int unit)

@@ -14,6 +14,10 @@
 
 #include <string>
 #include <vector>
+#include <set>
 #include <unordered_map>
+#include <tuple>
+
+#include <algorithm>
 
 #include <gmath.h>

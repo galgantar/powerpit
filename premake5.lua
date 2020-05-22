@@ -50,7 +50,12 @@ project "powerpit"
 		"%{prj.name}/vendor/gmath/*.hpp",
 
 		"%{prj.name}/vendor/SOIL2/src/SOIL2/*.h",
-		"%{prj.name}/vendor/SOIL2/src/SOIL2/*.c"
+		"%{prj.name}/vendor/SOIL2/src/SOIL2/*.c",
+
+        -- ASSIMP
+        -- "%{prj.name}/vendor/assimp/code/**",
+
+       
 	}
 
 	defines
@@ -59,7 +64,7 @@ project "powerpit"
 
 		-- for glfw
 		"_GLFW_WIN32",
-		"_CRT_SECURE_NO_WARNINGS"
+		"_CRT_SECURE_NO_WARNINGS",
 	}
 
 	includedirs
@@ -68,12 +73,15 @@ project "powerpit"
 		"%{prj.name}/vendor/glad/include",
 		"%{prj.name}/vendor/gmath",
 		"%{prj.name}/vendor/SOIL2/src/SOIL2",
+		
+		"%{prj.name}/vendor/assimp/include",
 	}
 
 	links
 	{
-		"opengl32.lib"
+		"opengl32.lib",
+		"D:/0_Gal/Programiranje/Repositories/powerpit/powerpit/vendor/assimp/lib/assimp-vc142-mtd.lib"
 	}
 
-	filter "files:**.c"
+	files { "vendor/**.cpp", "vendor/**.c", "vendor/**.inl" }
 		flags { "NoPCH" }

@@ -55,7 +55,7 @@ in vec2 texCoord;
 uniform vec3 viewPos;
 uniform Material material;
 uniform DirectionalLight dirLight;
-uniform SpotLight spotLight;
+//uniform SpotLight spotLight;
 uniform PointLight pointLights[4];
 
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
@@ -119,9 +119,11 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - fragPos);
 
-    vec3 finalFragColor = CalcDirectionalLight(dirLight, norm, viewDir);
+    vec3 finalFragColor = vec3(0.0, 0.0, 0.0);
     
-    finalFragColor += CalcSpotLight(spotLight, norm, viewDir);
+    finalFragColor = CalcDirectionalLight(dirLight, norm, viewDir);
+ 
+    //finalFragColor += CalcSpotLight(spotLight, norm, viewDir);
 
     for (int i = 0; i < 4; ++i)
         finalFragColor += CalcPointLight(pointLights[i], norm, viewDir);
