@@ -2,15 +2,14 @@
 
 #include "Mesh.h"
 
-#include "VertexArrayObject.h"
 #include "Texture.h"
 #include "Shader.h"
 #include "SafeCall.h"
 
-Mesh::Mesh(std::vector<Vertex>& in_vertices, std::vector<unsigned int>& in_indices, std::vector<Texture>& in_textures)
+Mesh::Mesh(std::vector<Vertex>&& in_vertices, std::vector<unsigned int>&& in_indices, std::vector<Texture>&& in_textures)
 	: 
 		vertices(std::move(in_vertices)),
-		indices(std::move(in_indices)),
+		indices (std::move(in_indices )),
 		textures(std::move(in_textures))
 {
 	GLcall(glGenBuffers(1, &VBO));
@@ -25,7 +24,7 @@ Mesh::Mesh(std::vector<Vertex>& in_vertices, std::vector<unsigned int>& in_indic
 	GLcall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
 	GLcall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW));
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	glEnableVertexAttribArray(1);

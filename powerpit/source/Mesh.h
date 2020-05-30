@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PCH.h"
-#include "VertexArrayObject.h"
 #include "Texture.h"
 #include "Shader.h"
 
@@ -24,7 +23,7 @@ private:
 	unsigned int EBO;
 
 public:
-	Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<Texture>& textures);
+	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<Texture>&& textures);
 	Mesh(Mesh&& old) noexcept;
 	~Mesh();
 

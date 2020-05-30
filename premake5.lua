@@ -55,7 +55,6 @@ project "powerpit"
         -- ASSIMP
         -- "%{prj.name}/vendor/assimp/code/**",
 
-       
 	}
 
 	defines

@@ -17,20 +17,6 @@ Texture::Texture(const std::string& path, bool needAlpha, const std::string& typ
 	LoadTextureFromFile(path, needAlpha);
 }
 
-Texture::Texture(const Texture& t)
-{
-	std::cout << "went wrong" << std::endl;
-	__debugbreak();
-}
-
-Texture& Texture::operator=(const Texture& t)
-{
-	std::cout << "went wrong" << std::endl;
-	__debugbreak();
-	return Texture("lala", true, "hopsasa");
-}
-
-
 Texture::Texture(Texture&& old) noexcept
 	: 
 	id(std::move(old.id)),

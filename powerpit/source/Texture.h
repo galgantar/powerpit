@@ -11,8 +11,8 @@ private:
 
 public:
 	Texture(const std::string& path, bool needAlpha, const std::string& type);
-	Texture(const Texture& t);
-	Texture& operator=(const Texture& t);
+	Texture(const Texture& t) = delete;
+	Texture& operator=(const Texture& t) = delete;
 	Texture(Texture&& old) noexcept;
 	~Texture();
 

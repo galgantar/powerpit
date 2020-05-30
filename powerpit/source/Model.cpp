@@ -85,7 +85,7 @@ Mesh Model::ProcessMesh(const aiMesh& mesh, const aiScene& scene)
 		LoadMaterialTextures(textures, *material, aiTextureType_SPECULAR, "texture_specular");
 	}
 
-	return Mesh(vertices, indices, textures);
+	return Mesh(std::move(vertices), std::move(indices), std::move(textures));
 }
 
 void Model::LoadMaterialTextures(std::vector<Texture>& dest, const aiMaterial& material, aiTextureType aitype, const std::string& typeName)
