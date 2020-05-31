@@ -80,7 +80,7 @@ int main()
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS); // objects in front rendered on top
+    glDepthFunc(GL_LEQUAL); // objects in front rendered on top
     glEnable(GL_STENCIL_TEST);
     /*
     usless for now:
@@ -99,6 +99,7 @@ int main()
     Shader* lightShader = new Shader("shaders/LightSourceVertex.shader", "shaders/LightSourceFragment.shader");
     Shader* outlineShader = new Shader("shaders/VertexShader.shader", "shaders/PlainColor.shader");
     Shader* quadShader = new Shader("shaders/PostprocessingVertex.shader", "shaders/PostprocessingFragment.shader");
+    Shader* skyboxShader = new Shader("shaders/SkyboxVertex.shader", "shaders/SkyboxFragment.shader");
 
     Camera* camera = new Camera(gm::vec3(0.0f, 0.0f, 3.0f), gm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -148,12 +149,57 @@ int main()
         -0.5f,  0.5f,  0.5f,
         -0.5f,  0.5f, -0.5f,         
     };
+    float skyboxVertices[] = {
+        // positions          
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
     unsigned int l_VAO, l_VBO, l_IBO;
     GLcall(glGenVertexArrays(1, &l_VAO));
     GLcall(glBindVertexArray(l_VAO));
     GLcall(glGenBuffers(1, &l_VBO));
     GLcall(glBindBuffer(GL_ARRAY_BUFFER, l_VBO));
-    GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(plainVertices), plainVertices, GL_STATIC_DRAW));
+    GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW));
     GLcall(glEnableVertexAttribArray(0));
     GLcall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
     GLcall(glBindVertexArray(0));
@@ -190,62 +236,53 @@ int main()
         shader->SetUniform1f(lightIndex + ".constant_val", 1.0f);
     }
 
-    float quadVertices[] = {
-        -1.0f,  1.0f,  0.0f, 1.0f,
-        -1.0f, -1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-
-        -1.0f,  1.0f,  0.0f, 1.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f,  1.0f, 1.0f
+    
+    // cube map
+    unsigned int skybox;
+    glGenTextures(1, &skybox);
+    GLcall(glBindTexture(GL_TEXTURE_CUBE_MAP, skybox));
+    
+    std::string faces[] = { 
+        "right.jpg",
+        "left.jpg",
+        "top.jpg",
+        "bottom.jpg",
+        "front.jpg",
+        "back.jpg"
     };
+    
+    int i_width, i_height, i_nrChannels;
+    for (int i = 0; i < 6; ++i) {
+        unsigned char* data = SOIL_load_image((std::string("assets/textures/skybox/") + faces[i]).c_str(), &i_width, &i_height, &i_nrChannels, 0);
+        if (data) {
+            GLcall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, i_width, i_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data));
+        }
+        else {
+            std::cout << "sth went wrong " << (std::string("assets/textures/skybox/") + faces[i]).c_str() << std::endl;
+        }
+        SOIL_free_image_data(data);
+    }
 
-    unsigned int qVAO, qVBO;
-    GLcall(glGenVertexArrays(1, &qVAO));
-    GLcall(glBindVertexArray(qVAO));
-    GLcall(glGenBuffers(1, &qVBO));
-    GLcall(glBindBuffer(GL_ARRAY_BUFFER, qVBO));
-    GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW));
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    
+    unsigned int VAO, VBO;
+    GLcall(glGenVertexArrays(1, &VAO));
+    GLcall(glBindVertexArray(VAO));
+    GLcall(glGenBuffers(1, &VBO));
+    GLcall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+    GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(plainVertices), plainVertices, GL_STATIC_DRAW));
+
     GLcall(glEnableVertexAttribArray(0));
-    GLcall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, (void*)0));
-    GLcall(glEnableVertexAttribArray(1));
-    GLcall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 16, (void*)8));
-
+    GLcall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, (void*)0));
+    GLcall(glBindVertexArray(0));
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-
-
-
-    // off screen rendering
-    unsigned int FBO;
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    GLcall(glBindTexture(GL_TEXTURE_2D, texture));
-    GLcall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr));
-    GLcall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GLcall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-
-    GLcall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0));
-    GLcall(glBindTexture(GL_TEXTURE_2D, 0));
-
-    
-    unsigned int RBO;
-    glGenRenderbuffers(1, &RBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "FRAMEBUFFER INCOMPLETE" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    
 
     float time = (float)glfwGetTime();
     double lastMouseX, lastMouseY;
@@ -256,8 +293,7 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-        glClearColor(0.f, 0.f, 0.f, 1.0f);
+        // glClearColor(0.1f, 0.1f, 0.2f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
         
@@ -285,10 +321,10 @@ int main()
         GLcall(glBindVertexArray(l_VAO));
         for (int i = 0; i < 4; ++i) {
             std::string lightIndex = "pointLights[" + std::to_string(i) + "]";
-            shader->SetUniform3f(lightIndex + ".position", {-2.f, 0.f, 5.f * i });
+            shader->SetUniform3f(lightIndex + ".position", { -2.f, 0.f, 5.f * i });
             
             gm::mat4 l_model = gm::translate(gm::mat4(1.f), { -2.f, 0.f, 5.f * i });
-            l_model = gm::scale(l_model, { 0.7f });
+            l_model = gm::scale(l_model, { 0.3f });
             lightShader->SetUniformMat4f("model", l_model);
             lightShader->Bind();
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -303,20 +339,22 @@ int main()
             shader->SetUniformMat4f("model", test_model);
             backpack->Draw(*shader);
         }
-        
 
-        // quad rendering
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(0.f, 0.f, 1.f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
-        glBindVertexArray(qVAO);
-        GLcall(glActiveTexture(GL_TEXTURE0));
-        glBindTexture(GL_TEXTURE_2D, texture);
-        quadShader->SetUniform1i("quad", 0);
-        quadShader->Bind();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        quadShader->Unbind();
+        // Draw skybox
+        gm::mat4 sky_view = camera->GetViewMatrix();
+        sky_view[3][0] = 0.f;
+        sky_view[3][1] = 0.f;
+        sky_view[3][2] = 0.f;
+        sky_view[0][3] = 0.f;
+        sky_view[1][3] = 0.f;
+        sky_view[2][3] = 0.f;
+        skyboxShader->SetUniformMat4f("view", sky_view);
+        skyboxShader->SetUniformMat4f("projection", projection);
+        GLcall(glBindVertexArray(VAO));
+        GLcall(glBindTexture(GL_TEXTURE_CUBE_MAP, skybox));
+        skyboxShader->Bind();
+        GLcall(glDrawArrays(GL_TRIANGLES, 0, 36));
+
 
         glfwSwapBuffers(window);
 
@@ -328,9 +366,8 @@ int main()
     delete outlineShader;
     delete camera;
     delete backpack;
-    
-    glDeleteFramebuffers(1, &FBO);
-    
+    delete skyboxShader;
+
     glfwTerminate();
     return 0;
 }
