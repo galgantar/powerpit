@@ -12,7 +12,7 @@ private:
 	int GetUniformLocation(const std::string& name);
 
 public:
-	Shader(const char* vertexSource, const char* fragmentSource);
+	Shader(const char* vertexSource, const char* fragmentSource, const char* geometrySource = nullptr);
 	~Shader();
 	void Bind();
 	void Unbind();
@@ -21,4 +21,7 @@ public:
 	void SetUniform1f(const std::string& name, const float f);
 	void SetUniform1i(const std::string& name, const int value);
 	void SetUniformMat4f(const std::string& name, const gm::mat4& value);
+
+	// temporary 
+	inline unsigned int GetID() { return id; }
 };

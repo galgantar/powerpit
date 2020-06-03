@@ -95,11 +95,13 @@ int main()
     glCullFace(GL_BACK); 
     glFrontFace(GL_CCW);
 
-    Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader");
-    Shader* lightShader = new Shader("shaders/LightSourceVertex.shader", "shaders/LightSourceFragment.shader");
+    Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader", "shaders/DecomposeGeometry.shader");
+    Shader* lightShader = new Shader("shaders/LightSourceVertex.shader", "shaders/LightSourceFragment.shader", "shaders/Geometry.shader");
     Shader* outlineShader = new Shader("shaders/VertexShader.shader", "shaders/PlainColor.shader");
     Shader* quadShader = new Shader("shaders/PostprocessingVertex.shader", "shaders/PostprocessingFragment.shader");
     Shader* skyboxShader = new Shader("shaders/SkyboxVertex.shader", "shaders/SkyboxFragment.shader");
+    Shader* reflectionShader = new Shader("shaders/ENVmapVertex.shader", "shaders/ReflectionFragment.shader");
+    Shader* refractionShader = new Shader("shaders/ENVmapVertex.shader", "shaders/RefractionFragment.shader");
 
     Camera* camera = new Camera(gm::vec3(0.0f, 0.0f, 3.0f), gm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -205,7 +207,6 @@ int main()
     GLcall(glBindVertexArray(0));
 
 
-
     // Directional light
     shader->SetUniform3f("dirLight.direction", { 0.f, -1.f, 0.f });
     shader->SetUniform3f("dirLight.ambient", { 0.05f, 0.05f, 0.05f });
@@ -285,10 +286,29 @@ int main()
     glfwGetWindowSize(window, &width, &height);
 
     float time = (float)glfwGetTime();
+
+
     double lastMouseX, lastMouseY;
     glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
 
     gm::mat4 projection = gm::perspective(gm::radians(60.0f), (float)width / height, 0.1f, 100.0f);
+
+
+    // uniform buffer object
+    unsigned int uboMatrix;
+    glGenBuffers(1, &uboMatrix);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrix);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * 64, nullptr, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrix, 0, 2 * 64); // allocate entire buffer to binding point 0
+    
+    gm::mat4 t_projection = gm::transpose(projection);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, gm::value_ptr(t_projection));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    unsigned int uniformBlockIndex = glGetUniformBlockIndex(lightShader->GetID(), "Matrices");
+    glUniformBlockBinding(lightShader->GetID(), uniformBlockIndex, 0); // bind uniform block to binding point 0
 
 
     while (!glfwWindowShouldClose(window))
@@ -300,22 +320,26 @@ int main()
 
         float deltaTime = CalculateDeltaTime(time);
         
+        shader->SetUniform1f("deltaTime", (float)glfwGetTime());
+
         ProcessMouseInput(window, camera, deltaTime, lastMouseX, lastMouseY);
         ProcessInput(window, camera, deltaTime);
 
         
         gm::mat4 view = camera->GetViewMatrix();
+        gm::mat4 t_view = gm::transpose(view);
+        glBindBuffer(GL_UNIFORM_BUFFER, uboMatrix);
+        glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, gm::value_ptr(t_view));
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 
         shader->SetUniform3f("spotLight.position", camera->GetPosition());
         shader->SetUniform3f("spotLight.direction", camera->GetFront());
 
-        shader->SetUniformMat4f("view", view);
-        shader->SetUniformMat4f("projection", projection);
+        reflectionShader->SetUniform3f("cameraPos", camera->GetPosition());
+        refractionShader->SetUniform3f("cameraPos", camera->GetPosition());
 
-        
         // Draw lights
-        lightShader->SetUniformMat4f("projection", projection);
-        lightShader->SetUniformMat4f("view", view);
         lightShader->Bind();
 
         GLcall(glBindVertexArray(l_VAO));
@@ -332,6 +356,7 @@ int main()
         lightShader->Unbind();
         GLcall(glBindVertexArray(0));
 
+        GLcall(glBindTexture(GL_TEXTURE_CUBE_MAP, skybox));
 
         // Draw models
         for (int i = 0; i < 10; ++i) {
@@ -348,8 +373,7 @@ int main()
         sky_view[0][3] = 0.f;
         sky_view[1][3] = 0.f;
         sky_view[2][3] = 0.f;
-        skyboxShader->SetUniformMat4f("view", sky_view);
-        skyboxShader->SetUniformMat4f("projection", projection);
+        skyboxShader->SetUniformMat4f("sky_view", sky_view);
         GLcall(glBindVertexArray(VAO));
         GLcall(glBindTexture(GL_TEXTURE_CUBE_MAP, skybox));
         skyboxShader->Bind();
@@ -367,6 +391,8 @@ int main()
     delete camera;
     delete backpack;
     delete skyboxShader;
+    delete reflectionShader;
+    delete refractionShader;
 
     glfwTerminate();
     return 0;

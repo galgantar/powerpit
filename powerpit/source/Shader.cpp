@@ -44,6 +44,7 @@ unsigned int Shader::CompileShader(const char* sourceFile, GLenum type)
 		switch (type) {
 			case GL_VERTEX_SHADER: s_type = "VertexShader"; break;
 			case GL_FRAGMENT_SHADER: s_type = "FragmentShader"; break;
+			case GL_GEOMETRY_SHADER: s_type = "GeometryShader"; break;
 			default: s_type = "UnknownType";
 		}
 		
@@ -70,14 +71,25 @@ int Shader::GetUniformLocation(const std::string& name)
 	return location;
 }
 
-Shader::Shader(const char* vertexSource, const char* fragmentSource)
+Shader::Shader(const char* vertexSource, const char* fragmentSource, const char* geometrySource)
 {
+	id = glCreateProgram();
+	
 	unsigned int vertexShader = CompileShader(vertexSource, GL_VERTEX_SHADER);
 	unsigned int fragmentShader = CompileShader(fragmentSource, GL_FRAGMENT_SHADER);
 	
-	id = glCreateProgram();
 	GLcall(glAttachShader(id, vertexShader));
 	GLcall(glAttachShader(id, fragmentShader));
+	GLcall(glDeleteShader(vertexShader));
+	GLcall(glDeleteShader(fragmentShader));
+
+
+	if (geometrySource) {
+		unsigned int geometryShader = CompileShader(geometrySource, GL_GEOMETRY_SHADER);
+		GLcall(glAttachShader(id, geometryShader));
+		GLcall(glDeleteShader(geometryShader));
+	}
+
 
 	// Link output of vertex to fragment shader
 	GLcall(glLinkProgram(id));
@@ -87,11 +99,8 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource)
 	if (!success) {
 		char infoLog[512];
 		GLcall(glGetProgramInfoLog(id, 512, nullptr, infoLog));
-		std::cout << "Shader linking failed " << infoLog << std::endl;
+		std::cout << "Shader linking failed " << infoLog << vertexSource << fragmentSource << std::endl;
 	}
-
-	GLcall(glDeleteShader(vertexShader));
-	GLcall(glDeleteShader(fragmentShader));
 }
 
 Shader::~Shader()
