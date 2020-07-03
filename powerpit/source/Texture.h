@@ -1,7 +1,8 @@
 #pragma once
 
 
-class Texture {
+class Texture
+{
 private:
 	unsigned int id;
 	std::string aiType;
@@ -19,5 +20,6 @@ public:
 	void Bind(unsigned int unit);
 	void Unbind();
 
+	// temporary
 	inline unsigned int GetID() { return id; }
 };

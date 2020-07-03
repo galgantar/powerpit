@@ -26,7 +26,7 @@ void main()
         1, 1, 1,
         1, -8, 1,
         1, 1, 1
-        );
+    );
 
     vec3 sampleTex[9];
     for (int i = 0; i < 9; i++)

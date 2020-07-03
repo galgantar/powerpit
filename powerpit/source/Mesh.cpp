@@ -67,8 +67,8 @@ void Mesh::Draw(Shader& shader)
 	}
 
 	if (textures.size() >= 2) {
-		//textures[0].Bind(1);
-		//shader.SetUniform1i("material.specularMap", 1);
+		textures[1].Bind(1);
+		shader.SetUniform1i("material.specularMap", 1);
 	}
 		
 	shader.SetUniform1f("material.shininess", 32.f);

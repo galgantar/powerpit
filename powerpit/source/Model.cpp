@@ -24,7 +24,7 @@ Model::Model(const std::string& path)
 	directory = path.substr(0, path.find_last_of('/'));
 
 	ProcessNode(*scene->mRootNode, *scene);
-	std::cout << "Done loading model" << std::endl;
+	std::cout << "Done loading model: " << path << std::endl;
 }
 
 void Model::ProcessNode(const aiNode& node, const aiScene& scene)
@@ -37,7 +37,7 @@ void Model::ProcessNode(const aiNode& node, const aiScene& scene)
 	for (int i = 0; i < node.mNumChildren; ++i) {
 		ProcessNode(*node.mChildren[i], scene);
 	}
-	std::cout << "Processed node: " << std::string(node.mName.C_Str()) << std::endl;
+	std::cout << "Processed node: " << node.mName.C_Str() << std::endl;
 }
 
 Mesh Model::ProcessMesh(const aiMesh& mesh, const aiScene& scene)
@@ -96,7 +96,7 @@ void Model::LoadMaterialTextures(std::vector<Texture>& dest, const aiMaterial& m
 		std::string name = std::string(str.C_Str());
 
 		if (texturesLoaded.find(name) == texturesLoaded.end()) {
-			std::cout << "pushing texture" << std::endl;
+			std::cout << "pushing texture " << name << std::endl;
 			dest.push_back(Texture(directory + '/' + name, true, typeName));
 			texturesLoaded.insert(name);
 		}

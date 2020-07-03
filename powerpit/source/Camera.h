@@ -42,5 +42,4 @@ public:
 	void Yaw(const double offset, float deltaTime);
 
 	gm::mat4 GetViewMatrix();
-
 };

@@ -24,4 +24,7 @@ public:
 	~Model() = default;
 
 	void Draw(Shader& shader);
+
+	// temporary
+	std::vector<Mesh>& GetMeshes() { return meshes; }
 };

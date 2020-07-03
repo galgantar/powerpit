@@ -28,4 +28,9 @@ public:
 	~Mesh();
 
 	void Draw(Shader& shader);
+
+	// temporary
+	unsigned int GetVAO() { return VAO; }
+	std::vector<unsigned int>& GetIndices() { return indices; }
+	std::vector<Texture>& GetTextures() { return textures; }
 };

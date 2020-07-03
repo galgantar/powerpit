@@ -11,8 +11,8 @@ layout (std140) uniform Matrices
 };
 
 out VS_OUT {
-	vec3 fragPos;
 	vec3 Normal;
+	vec3 fragPos;
 	vec2 texCoord;
 } vs_out;
 

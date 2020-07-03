@@ -91,21 +91,27 @@ int main()
 
     
     //face culling messes with the 3d models
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK); 
-    glFrontFace(GL_CCW);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK); 
+    //glFrontFace(GL_CCW);
 
-    Shader* shader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader", "shaders/DecomposeGeometry.shader");
+    Shader* modelShader = new Shader("shaders/VertexShader.shader", "shaders/FragmentShader.shader", 0);
     Shader* lightShader = new Shader("shaders/LightSourceVertex.shader", "shaders/LightSourceFragment.shader", "shaders/Geometry.shader");
     Shader* outlineShader = new Shader("shaders/VertexShader.shader", "shaders/PlainColor.shader");
     Shader* quadShader = new Shader("shaders/PostprocessingVertex.shader", "shaders/PostprocessingFragment.shader");
     Shader* skyboxShader = new Shader("shaders/SkyboxVertex.shader", "shaders/SkyboxFragment.shader");
     Shader* reflectionShader = new Shader("shaders/ENVmapVertex.shader", "shaders/ReflectionFragment.shader");
     Shader* refractionShader = new Shader("shaders/ENVmapVertex.shader", "shaders/RefractionFragment.shader");
+    Shader* plainShader = new Shader("shaders/VertexShader.shader", "shaders/PlainColor.shader");
+    Shader* instanceShader = new Shader("shaders/BatchRenderingModelVertex.shader", "shaders/TestFragment.shader");
 
     Camera* camera = new Camera(gm::vec3(0.0f, 0.0f, 3.0f), gm::vec3(0.0f, 1.0f, 0.0f));
 
-    Model* backpack = new Model("assets/models/backpack/backpack.obj");
+    Texture* grass = new Texture("assets/textures/grass.png", true, "");
+
+    // Model* backpack = new Model("assets/models/backpack/backpack.obj");
+    Model* planet = new Model("assets/models/planet/planet.obj");
+    Model* rock = new Model("assets/models/rock/rock.obj");
 
     float plainVertices[] = {
         // back face
@@ -196,22 +202,44 @@ int main()
          1.0f, -1.0f,  1.0f
     };
 
-    unsigned int l_VAO, l_VBO, l_IBO;
-    GLcall(glGenVertexArrays(1, &l_VAO));
-    GLcall(glBindVertexArray(l_VAO));
-    GLcall(glGenBuffers(1, &l_VBO));
-    GLcall(glBindBuffer(GL_ARRAY_BUFFER, l_VBO));
-    GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW));
-    GLcall(glEnableVertexAttribArray(0));
-    GLcall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
-    GLcall(glBindVertexArray(0));
+    
+    float vertices[] = {
+         0.5f,  0.5f,  0.0f, 
+         0.5f, -0.5f,  0.0f,
+        -0.5f, -0.5f,  0.0f,
+        -0.5f,  0.5f,  0.0f,
+    };
 
+    unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+
+    unsigned int planeVAO, VBO, EBO;
+    GLcall(glGenVertexArrays(1, &planeVAO));
+    GLcall(glBindVertexArray(planeVAO));
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    GLcall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+    GLcall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
+
+    GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+    GLcall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
+
+    
+    glEnableVertexAttribArray(0);
+    GLcall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, (void*)0));
+    //glEnableVertexAttribArray(1);
+    //GLcall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, (void*)12));
+
+    glBindVertexArray(0);
 
     // Directional light
-    shader->SetUniform3f("dirLight.direction", { 0.f, -1.f, 0.f });
-    shader->SetUniform3f("dirLight.ambient", { 0.05f, 0.05f, 0.05f });
-    shader->SetUniform3f("dirLight.diffuse", { 0.4f, 0.4f, 0.4f });
-    shader->SetUniform3f("dirLight.specular", { 0.5f, 0.5f, 0.5f });
+    modelShader->SetUniform3f("dirLight.direction", { 0.f, -1.f, 0.f });
+    modelShader->SetUniform3f("dirLight.ambient", { 0.05f, 0.05f, 0.05f });
+    modelShader->SetUniform3f("dirLight.diffuse", { 0.4f, 0.4f, 0.4f });
+    modelShader->SetUniform3f("dirLight.specular", { 0.5f, 0.5f, 0.5f });
 
     // Spotligt
     /*shader->SetUniform3f("spotLight.ambient", { 0.8f, 0.8f, 0.8f });
@@ -228,16 +256,76 @@ int main()
    // Point lights
     for (int i = 0; i < 4; ++i) {
         std::string lightIndex = "pointLights[" + std::to_string(i) + "]";
-        shader->SetUniform3f(lightIndex + ".position", {-2.f, 0.f, 5.f * i});
-        shader->SetUniform3f(lightIndex + ".ambient", { 0.05f, 0.05f, 0.05f });
-        shader->SetUniform3f(lightIndex + ".diffuse", { 0.9f, 0.9f, 0.9f });
-        shader->SetUniform3f(lightIndex + ".specular", { 1.0f, 1.0f, 1.0f });
-        shader->SetUniform1f(lightIndex + ".quadratic_val", 0.032f);
-        shader->SetUniform1f(lightIndex + ".linear_val", 0.09f);
-        shader->SetUniform1f(lightIndex + ".constant_val", 1.0f);
+        modelShader->SetUniform3f(lightIndex + ".position", {-2.f, 0.f, 5.f * i});
+        modelShader->SetUniform3f(lightIndex + ".ambient", { 0.05f, 0.05f, 0.05f });
+        modelShader->SetUniform3f(lightIndex + ".diffuse", { 0.9f, 0.9f, 0.9f });
+        modelShader->SetUniform3f(lightIndex + ".specular", { 1.0f, 1.0f, 1.0f });
+        modelShader->SetUniform1f(lightIndex + ".quadratic_val", 0.032f);
+        modelShader->SetUniform1f(lightIndex + ".linear_val", 0.09f);
+        modelShader->SetUniform1f(lightIndex + ".constant_val", 1.0f);
     }
 
-    
+    // asteroid field data
+    size_t size = 10000;
+    gm::mat4* model_matrices = new gm::mat4[size];
+    srand(glfwGetTime());
+    float radius = 50.0;
+    float offset = 10.f;
+    for (unsigned int i = 0; i < size; i++)
+    {
+        gm::mat4 model = gm::mat4(1.0f);
+        // 1. translation: displace along circle with 'radius' in range [-offset, offset]
+        float angle = (float)i / (float)size * 360.0f;
+        float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        float x = sin(angle) * radius + displacement;
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        float y = displacement * 0.4f; // keep height of field smaller compared to width of x and z
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        float z = cos(angle) * radius + displacement;
+        model = gm::translate(model, gm::vec3(x, y, z));
+
+        // 2. scale: scale between 0.05 and 0.25f
+        float scale = (rand() % 20) / 100.0f + 0.05;
+        model = gm::scale(model, gm::vec3(scale));
+
+        // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
+        float rotAngle = (rand() % 360);
+        model = gm::rotate(model, gm::vec3(0.4f, 0.6f, 0.8f), rotAngle);
+
+        // 4. now add to list of matrices
+        model_matrices[i] = gm::transpose(model);
+    }
+
+    unsigned int buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, size * 64, model_matrices, GL_STATIC_DRAW);
+
+    for (unsigned int i = 0; i < rock->GetMeshes().size(); i++)
+    {
+        unsigned int VAO = rock->GetMeshes()[i].GetVAO();
+        glBindVertexArray(VAO);
+        // vertex attributes
+        std::size_t vec4Size = 16;
+
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(0);
+    }
+
+
     // cube map
     unsigned int skybox;
     glGenTextures(1, &skybox);
@@ -270,17 +358,19 @@ int main()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    
-    unsigned int VAO, VBO;
-    GLcall(glGenVertexArrays(1, &VAO));
-    GLcall(glBindVertexArray(VAO));
-    GLcall(glGenBuffers(1, &VBO));
-    GLcall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+
+    // skybox
+    unsigned int sky_VAO, sky_VBO;
+    GLcall(glGenVertexArrays(1, &sky_VAO));
+    GLcall(glBindVertexArray(sky_VAO));
+    GLcall(glGenBuffers(1, &sky_VBO));
+    GLcall(glBindBuffer(GL_ARRAY_BUFFER, sky_VBO));
     GLcall(glBufferData(GL_ARRAY_BUFFER, sizeof(plainVertices), plainVertices, GL_STATIC_DRAW));
 
     GLcall(glEnableVertexAttribArray(0));
     GLcall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, (void*)0));
     GLcall(glBindVertexArray(0));
+
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
@@ -313,14 +403,12 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        // glClearColor(0.1f, 0.1f, 0.2f, 1.f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
         
 
         float deltaTime = CalculateDeltaTime(time);
-        
-        shader->SetUniform1f("deltaTime", (float)glfwGetTime());
 
         ProcessMouseInput(window, camera, deltaTime, lastMouseX, lastMouseY);
         ProcessInput(window, camera, deltaTime);
@@ -333,40 +421,51 @@ int main()
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
-        shader->SetUniform3f("spotLight.position", camera->GetPosition());
-        shader->SetUniform3f("spotLight.direction", camera->GetFront());
+        // Draw stuff
+        
+        // quad
+        gm::mat4 q_model(1.f);
+        q_model = gm::translate(q_model, { 0.f, -2.f, 0.f });
+        q_model = gm::rotate(q_model, { 1.f, 0.f, 0.f }, gm::radians(90.f));
+        q_model = gm::scale(q_model, { 10.f });
+        plainShader->SetUniformMat4f("model", q_model);
+        plainShader->SetUniform3f("color", { 0.f, 1.f, 0.f });
+        GLcall(glBindVertexArray(planeVAO));
+        plainShader->Bind();
+        GLcall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
 
-        reflectionShader->SetUniform3f("cameraPos", camera->GetPosition());
-        refractionShader->SetUniform3f("cameraPos", camera->GetPosition());
+        // planet
+        gm::mat4 planet_model(1.f);
+        planet_model = gm::scale(planet_model, { 0.3f });
+        planet_model = gm::translate(planet_model, { 0.f, 2.f, 1.f });
+        modelShader->SetUniformMat4f("model", planet_model);
+        planet->Draw(*modelShader);
 
-        // Draw lights
-        lightShader->Bind();
+        // asteroid field
 
-        GLcall(glBindVertexArray(l_VAO));
-        for (int i = 0; i < 4; ++i) {
-            std::string lightIndex = "pointLights[" + std::to_string(i) + "]";
-            shader->SetUniform3f(lightIndex + ".position", { -2.f, 0.f, 5.f * i });
-            
-            gm::mat4 l_model = gm::translate(gm::mat4(1.f), { -2.f, 0.f, 5.f * i });
-            l_model = gm::scale(l_model, { 0.3f });
-            lightShader->SetUniformMat4f("model", l_model);
-            lightShader->Bind();
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+        instanceShader->SetUniform1i("material.diffuseMap", 0);
+        instanceShader->Bind();
+        for (unsigned int i = 0; i < rock->GetMeshes().size(); i++)
+        {
+            glBindVertexArray(rock->GetMeshes()[i].GetVAO());
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rock->GetMeshes()[i].GetTextures()[0].GetID());
+            glDrawElementsInstanced(GL_TRIANGLES, rock->GetMeshes()[i].GetIndices().size(), GL_UNSIGNED_INT, 0, size);
         }
-        lightShader->Unbind();
-        GLcall(glBindVertexArray(0));
 
-        GLcall(glBindTexture(GL_TEXTURE_CUBE_MAP, skybox));
 
-        // Draw models
-        for (int i = 0; i < 10; ++i) {
-            gm::mat4 test_model = gm::translate(gm::mat4(1.f), { 0.f, 0.f, 4.f * i });
-            shader->SetUniformMat4f("model", test_model);
-            backpack->Draw(*shader);
-        }
+        // grass
+        gm::mat4 g_model(1.f);
+        g_model = gm::translate(g_model, { 0.f, -1.f, 0.f });
+        plainShader->SetUniformMat4f("model", g_model);
+        plainShader->SetUniform3f("color", { 1.f, 0.f, 0.f });
+        GLcall(glBindVertexArray(planeVAO));
+        plainShader->Bind();
+        GLcall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+
 
         // Draw skybox
-        gm::mat4 sky_view = camera->GetViewMatrix();
+        gm::mat4 sky_view = view;
         sky_view[3][0] = 0.f;
         sky_view[3][1] = 0.f;
         sky_view[3][2] = 0.f;
@@ -374,7 +473,7 @@ int main()
         sky_view[1][3] = 0.f;
         sky_view[2][3] = 0.f;
         skyboxShader->SetUniformMat4f("sky_view", sky_view);
-        GLcall(glBindVertexArray(VAO));
+        GLcall(glBindVertexArray(sky_VAO));
         GLcall(glBindTexture(GL_TEXTURE_CUBE_MAP, skybox));
         skyboxShader->Bind();
         GLcall(glDrawArrays(GL_TRIANGLES, 0, 36));
@@ -385,14 +484,14 @@ int main()
         glfwPollEvents();
     }
     
-    delete shader;
+    delete modelShader;
     delete lightShader;
     delete outlineShader;
     delete camera;
-    delete backpack;
     delete skyboxShader;
     delete reflectionShader;
     delete refractionShader;
+    delete grass;
 
     glfwTerminate();
     return 0;
