@@ -131,5 +131,6 @@ void main()
     for (int i = 0; i < 4; ++i)
         finalFragColor += CalcPointLight(pointLights[i], norm, viewDir);
 
-    FragColor = vec4(finalFragColor, 1.0);
+    //FragColor = vec4(finalFragColor, 1.0);
+    FragColor = vec4(texture(material.diffuseMap, fs_in.texCoord).rgb, 1.0);
 }

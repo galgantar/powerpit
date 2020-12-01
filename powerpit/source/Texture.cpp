@@ -4,24 +4,79 @@
 #include "SafeCall.h"
 
 
-Texture::Texture(const std::string& path, bool needAlpha, const std::string& type)
-	: 
-		path(path),
-		aiType(type)
+void Texture::Set2DSettings()
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // minifying
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // magnifying
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR); // minifying
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR); // magnifying
+}
 
-	LoadTextureFromFile(path, needAlpha);
+void Texture::SetCubemapSettings()
+{
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+
+Texture::Texture(const std::string& path, const GLenum type, bool needAlpha)
+	: 
+		type(type)
+		
+{
+	GLcall(glGenTextures(1, &id));
+
+	switch (type) {
+
+		case GL_TEXTURE_2D:
+			GLcall(glBindTexture(GL_TEXTURE_2D, id));
+
+			Load2DTextureFromFile(path, needAlpha, GL_TEXTURE_2D);
+
+			GLcall(glGenerateMipmap(GL_TEXTURE_2D));
+		
+			Set2DSettings();
+			Unbind();
+		
+			break;
+
+
+		case GL_TEXTURE_CUBE_MAP:
+		{
+			GLcall(glBindTexture(GL_TEXTURE_CUBE_MAP, id));
+
+			// RGB hardcoded
+			const char* faces[] = {
+			"right.jpg",
+			"left.jpg",
+			"top.jpg",
+			"bottom.jpg",
+			"front.jpg",
+			"back.jpg"
+			};
+
+			for (int i = 0; i < 6; ++i) {
+				Load2DTextureFromFile(path + faces[i], needAlpha, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
+			}
+
+			SetCubemapSettings(); // important
+			Unbind();
+
+			break;
+		}
+		default:
+			const char* faces = nullptr;
+			std::cout << "something went wrong " << std::endl;
+			ASSERT(false);
+	};
 }
 
 Texture::Texture(Texture&& old) noexcept
 	: 
-	id(std::move(old.id)),
-	aiType(std::move(old.aiType)),
-	path(std::move(old.path))
+		id(std::move(old.id)),
+		type(std::move(old.type))
 {
 	old.id = -1;
 }
@@ -29,45 +84,40 @@ Texture::Texture(Texture&& old) noexcept
 Texture::~Texture()
 {
 	if (id != -1)
-		GLcall(glDeleteTextures(1, &id));
+		glDeleteTextures(1, &id);
 }
 
-void Texture::LoadTextureFromFile(const std::string& filename, bool needAlpha)
-{
-	int soilLoad, textureType;
+void Texture::Load2DTextureFromFile(const std::string& filename, bool needAlpha, GLenum dest)
+{	
+	int soilLoadType, channelType;
 	if (needAlpha) {
-		soilLoad = SOIL_LOAD_RGBA;
-		textureType = GL_RGBA;
+		soilLoadType = SOIL_LOAD_RGBA;
+		channelType = GL_RGBA;
 	}
 	else {
-		soilLoad = SOIL_LOAD_RGB;
-		textureType = GL_RGB;
+		soilLoadType = SOIL_LOAD_RGB;
+		channelType = GL_RGB;
 	}
 
 	int width, height, nrChannels;
-	unsigned char* data = SOIL_load_image(path.c_str(), &width, &height, nullptr, soilLoad);
+	unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, nullptr, soilLoadType);
 
 	if (!data) {
-		std::cout << "Texture source for " << path << " not found!" << std::endl;
+		std::cout << "Texture source for " << filename << " not found!" << std::endl;
 	}
-
-
-	GLcall(glGenTextures(1, &id));
-	GLcall(glBindTexture(GL_TEXTURE_2D, id));
-	GLcall(glTexImage2D(GL_TEXTURE_2D, 0, textureType, width, height, 0, textureType, GL_UNSIGNED_BYTE, data));
-	GLcall(glGenerateMipmap(GL_TEXTURE_2D));
-
+	
+	GLcall(glTexImage2D(dest, 0, channelType, width, height, 0, channelType, GL_UNSIGNED_BYTE, data));
+	
 	SOIL_free_image_data(data);
-	Unbind();
 }
 
-void Texture::Bind(unsigned int unit)
+void Texture::Bind(unsigned int unit) const
 {
 	GLcall(glActiveTexture(GL_TEXTURE0 + unit));
-	GLcall(glBindTexture(GL_TEXTURE_2D, id));
+	GLcall(glBindTexture(type, id));
 }
 
-void Texture::Unbind()
+void Texture::Unbind() const
 {
-	GLcall(glBindTexture(GL_TEXTURE_2D, 0));
+	glBindTexture(type, 0);
 }

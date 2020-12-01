@@ -4,8 +4,10 @@
 
 #include "Mesh.h"
 #include "Shader.h"
+#include "Primitives.h"
 
 #include <assimp/scene.h>
+
 
 class Model
 {
@@ -23,8 +25,5 @@ public:
 	Model(const std::string& path);
 	~Model() = default;
 
-	void Draw(Shader& shader);
-
-	// temporary
-	std::vector<Mesh>& GetMeshes() { return meshes; }
+	friend class Renderer;
 };

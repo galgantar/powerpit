@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "SafeCall.h"
+#include "Primitives.h"
 
 Mesh::Mesh(std::vector<Vertex>&& in_vertices, std::vector<unsigned int>&& in_indices, std::vector<Texture>&& in_textures)
 	: 
@@ -12,12 +13,27 @@ Mesh::Mesh(std::vector<Vertex>&& in_vertices, std::vector<unsigned int>&& in_ind
 		indices (std::move(in_indices )),
 		textures(std::move(in_textures))
 {
+	GenerateVertexArray();
+}
+
+Mesh::Mesh(Primitive&& p)
+	:
+	vertices(std::move(p.vertices)),
+	indices(std::move(p.indices))
+{
+	GenerateVertexArray();
+}
+
+
+
+void Mesh::GenerateVertexArray()
+{
 	GLcall(glGenBuffers(1, &VBO));
 	GLcall(glGenBuffers(1, &EBO));
 	GLcall(glGenVertexArrays(1, &VAO));
 
 	GLcall(glBindVertexArray(VAO));
-	
+
 	GLcall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
 	GLcall(glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW));
 
@@ -33,6 +49,7 @@ Mesh::Mesh(std::vector<Vertex>&& in_vertices, std::vector<unsigned int>&& in_ind
 
 	GLcall(glBindVertexArray(0));
 }
+
 
 Mesh::Mesh(Mesh&& old) noexcept
 	:
@@ -52,31 +69,9 @@ Mesh::Mesh(Mesh&& old) noexcept
 Mesh::~Mesh()
 {
 	if (VAO != -1)
-		GLcall(glDeleteVertexArrays(1, &VAO));
+		glDeleteVertexArrays(1, &VAO);
 	if (VBO != -1)
-		GLcall(glDeleteBuffers(1, &VBO));
+		glDeleteBuffers(1, &VBO);
 	if (EBO != -1)
-		GLcall(glDeleteBuffers(1, &EBO));
-}
-
-void Mesh::Draw(Shader& shader)
-{
-	if (textures.size() >= 1) {
-		textures[0].Bind(0);
-		shader.SetUniform1i("material.diffuseMap", 0);
-	}
-
-	if (textures.size() >= 2) {
-		textures[1].Bind(1);
-		shader.SetUniform1i("material.specularMap", 1);
-	}
-		
-	shader.SetUniform1f("material.shininess", 32.f);
-	
-
-	shader.Bind();
-	GLcall(glBindVertexArray(VAO));
-	GLcall(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0));
-	GLcall(glBindVertexArray(0));
-	shader.Unbind();
+		glDeleteBuffers(1, &EBO);
 }

@@ -6,11 +6,11 @@
 #include "SafeCall.h"
 
 
-void Shader::ParseFile(const char* filename, std::string& out)
+void Shader::ParseFile(const std::string& filename, std::string& out)
 {
 	std::ifstream stream(filename);
 	if (stream.fail())
-		std::cout << "Filename : " << filename << "does not exist" << std::endl;
+		std::cout << "Filename : " << filename << " does not exist!" << std::endl;
 
 	std::string line;
 
@@ -20,7 +20,7 @@ void Shader::ParseFile(const char* filename, std::string& out)
 	}
 }
 
-unsigned int Shader::CompileShader(const char* sourceFile, GLenum type)
+unsigned int Shader::CompileShader(const std::string& sourceFile, GLenum type)
 {
 	unsigned int shader;
 	std::string source;
@@ -54,24 +54,35 @@ unsigned int Shader::CompileShader(const char* sourceFile, GLenum type)
 	return shader;
 }
 
-int Shader::GetUniformLocation(const std::string& name)
-{	
+int Shader::FindUniformLocation(const std::string& name)
+{
 	std::unordered_map<std::string, int>::iterator it;
-	
+
 	if ((it = uniforms.find(name)) != uniforms.end())
 		return it->second;
 
 	int location = glGetUniformLocation(id, name.c_str());
+	uniforms[name] = location;
+
+	return location;
+}
+
+int Shader::GetUniformLocation(const std::string& name)
+{	
+	int location = FindUniformLocation(name);
 	
 	if (location == -1)
 		std::cout << "Uniform " << name << " not found!" << std::endl;
- 
-	uniforms[name] = location;
 	
 	return location;
 }
 
-Shader::Shader(const char* vertexSource, const char* fragmentSource, const char* geometrySource)
+bool Shader::HasUniform(const std::string& name)
+{
+	return FindUniformLocation(name) != -1;
+}
+
+Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource, const std::string& geometrySource)
 {
 	id = glCreateProgram();
 	
@@ -84,7 +95,7 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource, const char*
 	GLcall(glDeleteShader(fragmentShader));
 
 
-	if (geometrySource) {
+	if (geometrySource != "") {
 		unsigned int geometryShader = CompileShader(geometrySource, GL_GEOMETRY_SHADER);
 		GLcall(glAttachShader(id, geometryShader));
 		GLcall(glDeleteShader(geometryShader));
@@ -103,10 +114,18 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource, const char*
 	}
 }
 
+Shader::Shader(Shader&& old) noexcept
+	:
+	id(std::move(old.id)),
+	uniforms(std::move(old.uniforms))
+{
+	old.id = -1;
+}
+
 Shader::~Shader()
 {
-	Unbind();
-	GLcall(glDeleteProgram(id));
+	if (id != -1)
+		glDeleteProgram(id);
 }
 
 void Shader::Bind()
@@ -116,7 +135,7 @@ void Shader::Bind()
 
 void Shader::Unbind()
 {
-	GLcall(glUseProgram(0));
+	glUseProgram(0);
 }
 
 void Shader::SetUniform4f(const std::string& name, const gm::vec4& value)
@@ -162,4 +181,11 @@ void Shader::SetUniformMat4f(const std::string& name, const gm::mat4& value)
 	if (location != -1)
 		GLcall(glUniformMatrix4fv(location, 1, GL_TRUE, gm::value_ptr(value)));
 	Unbind();
+}
+
+// Unnecessary for only one uniform buffer
+void Shader::LinkToUniformBufferBinding(const unsigned int bindingPoint, const std::string& name)
+{
+	unsigned int blockIndex = glGetUniformBlockIndex(id, name.c_str());
+	glUniformBlockBinding(id, blockIndex, bindingPoint);
 }

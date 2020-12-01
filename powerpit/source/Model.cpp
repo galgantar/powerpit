@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "Mesh.h"
 #include "SafeCall.h"
+#include "Primitives.h"
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
@@ -37,7 +38,6 @@ void Model::ProcessNode(const aiNode& node, const aiScene& scene)
 	for (int i = 0; i < node.mNumChildren; ++i) {
 		ProcessNode(*node.mChildren[i], scene);
 	}
-	std::cout << "Processed node: " << node.mName.C_Str() << std::endl;
 }
 
 Mesh Model::ProcessMesh(const aiMesh& mesh, const aiScene& scene)
@@ -96,15 +96,8 @@ void Model::LoadMaterialTextures(std::vector<Texture>& dest, const aiMaterial& m
 		std::string name = std::string(str.C_Str());
 
 		if (texturesLoaded.find(name) == texturesLoaded.end()) {
-			std::cout << "pushing texture " << name << std::endl;
-			dest.push_back(Texture(directory + '/' + name, true, typeName));
+			dest.push_back(Texture(directory + '/' + name, GL_TEXTURE_2D, false));
 			texturesLoaded.insert(name);
 		}
 	}
-}
-
-void Model::Draw(Shader& shader)
-{
-	for (Mesh& mesh : meshes)
-		mesh.Draw(shader);
 }
