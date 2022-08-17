@@ -1,6 +1,9 @@
 # PowerPit
 Graphics rendering engine based on OpenGL.
 
+## Screenshot
+![Screenshot](screenshots/powerpit_engine.png)
+
 ## Current features
 * Custom math library for vector transformations
 * Lights (Phong model)
